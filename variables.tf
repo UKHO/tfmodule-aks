@@ -134,7 +134,7 @@ variable "user_node_pools" {
 
   validation {
     condition = alltrue([
-      for o in var.user_node_pools : contains(["Linux", "Windows"], o.access)
+      for o in var.user_node_pools : contains(["Linux", "Windows"], o.os_type)
     ])
     error_message = "All user node pools must have an os_type variable supplied with a value of either 'Linux' or 'Windows'"
   }
