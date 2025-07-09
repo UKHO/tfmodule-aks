@@ -121,6 +121,11 @@ variable "user_node_pools" {
   }))
 
   validation {
+    condition     = length(var.user_node_pools) > 0
+    error_message = "The user_node_pools variable must be supplied"
+  }
+
+  validation {
     condition = alltrue([
       for x in var.user_node_pools : length(x.name) > 0
     ])
