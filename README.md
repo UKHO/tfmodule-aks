@@ -107,6 +107,17 @@ variable "ip_rules" {
 
 Example usage: 
 
+locals {
+  user_node_pools = [{
+    name      = "linuxpool"
+    os_type   = "Linux"
+    vm_size   = var.aks_linux_node_vm_size
+    disk_size = var.aks_linux_node_disk_size
+    min_count = var.aks_linux_node_min_count
+    max_count = var.aks_linux_node_max_count
+  }]
+}
+
 module "aks" {
   source                    = "github.com/UKHO/tfmodule-aks"
   resource_group_name       = azurerm_resource_group.this.name
