@@ -90,8 +90,9 @@ resource "azurerm_role_assignment" "aks_vnet_reader" {
   principal_id         = azurerm_kubernetes_cluster.this.identity[0].principal_id
 }
 
-resource "azurerm_role_assignment" "aks_cluster_user" {
-  scope                = azurerm_kubernetes_cluster.this.id
-  role_definition_name = "Azure Kubernetes Service Cluster User Role"
-  principal_id         = var.principal_id
-}
+# TODO - We need to grant permissions to the pipeline SP (not the terraform SP), so that it can do helm deploys
+# resource "azurerm_role_assignment" "pipeline_aks_cluster_admin" {
+#   scope                = azurerm_kubernetes_cluster.this.id
+#   role_definition_name = "Azure Kubernetes Service Cluster Admin Role"
+#   principal_id         = var.pipeline_principal_id # TODO - Need to decide on how we name the pipeline_principal_id variable to differentiate it from var.principal_id
+# }
