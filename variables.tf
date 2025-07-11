@@ -185,9 +185,3 @@ variable "ip_rules" {
   type        = list(string)
   default     = []
 }
-
-variable "subnet_ids" {
-  description = "List of subnet IDs that are allowed to access the AKS Cluster"
-  type        = list(string)
-  default     = []
-}
