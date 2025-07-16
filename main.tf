@@ -78,7 +78,7 @@ resource "azurerm_kubernetes_cluster_node_pool" "node_pools" {
   eviction_policy       = var.aks_use_spot ? "Delete" : null
 
   lifecycle {
-    ignore_changes = [node_count, node_taints, node_labels]
+    ignore_changes = [node_count, node_taints, node_labels, upgrade_settings]
   }
 }
 
