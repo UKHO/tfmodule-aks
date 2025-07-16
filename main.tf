@@ -56,7 +56,7 @@ resource "azurerm_kubernetes_cluster" "this" {
   }
 
   lifecycle {
-    ignore_changes = [tags]
+    ignore_changes = [tags, microsoft_defender]
   }
 }
 
