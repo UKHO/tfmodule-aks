@@ -186,14 +186,20 @@ variable "ip_rules" {
   default     = []
 }
 
+variable "flux_enabled" {
+  description = "Enable Flux configuration for the AKS cluster"
+  type        = bool
+  default     = false
+}
+
 variable "flux_git_repository_url" {
   description = "Git repository URL for Flux configuration"
   type        = string
   default     = ""
   
   validation {
-    condition     = length(var.flux_git_repository_url) > 0
-    error_message = "The flux_git_repository_url variable must be supplied"
+    condition     = (length(var.flux_git_repository_url) > 0 || var.flux_enabled == false)
+    error_message = "The flux_git_repository_url variable must be supplied if Flux is enabled"
   }
 }
 
@@ -203,8 +209,8 @@ variable "flux_git_reference_type" {
   default     = "branch"
   
   validation {
-    condition     = length(var.flux_git_reference_type) > 0
-    error_message = "The flux_git_reference_type variable must be supplied"
+    condition     = (length(var.flux_git_reference_type) > 0 || var.flux_enabled == false)
+    error_message = "The flux_git_reference_type variable must be supplied if Flux is enabled"
   }
 }
 
@@ -214,8 +220,8 @@ variable "flux_git_reference_value" {
   default     = "main"
   
   validation {
-    condition     = length(var.flux_git_reference_value) > 0
-    error_message = "The flux_git_reference_value variable must be supplied"
+    condition     = (length(var.flux_git_reference_value) > 0 || var.flux_enabled == false)
+    error_message = "The flux_git_reference_value variable must be supplied if Flux is enabled"
   }
 }
 
@@ -225,8 +231,8 @@ variable "flux_ssh_private_key_base64" {
   default     = ""
   
   validation {
-    condition     = length(var.flux_ssh_private_key_base64) > 0
-    error_message = "The flux_ssh_private_key_base64 variable must be supplied"
+    condition     = (length(var.flux_ssh_private_key_base64) > 0 || var.flux_enabled == false)
+    error_message = "The flux_ssh_private_key_base64 variable must be supplied if Flux is enabled"
   }
 }
 
@@ -236,7 +242,7 @@ variable "flux_git_repository_path" {
   default     = ""
   
   validation {
-    condition     = length(var.flux_git_repository_path) > 0
-    error_message = "The flux_git_repository_path variable must be supplied"
+    condition     = (length(var.flux_git_repository_path) > 0 || var.flux_enabled == false)
+    error_message = "The flux_git_repository_path variable must be supplied if Flux is enabled"
   }
 }

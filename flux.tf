@@ -2,6 +2,8 @@ resource "azurerm_kubernetes_cluster_extension" "flux" {
   name           = "flux"
   cluster_id     = azurerm_kubernetes_cluster.this.id
   extension_type = "microsoft.flux"
+
+  count = var.flux_enabled ? 1 : 0
 }
 
 resource "azurerm_kubernetes_flux_configuration" "flux" {
@@ -26,6 +28,8 @@ resource "azurerm_kubernetes_flux_configuration" "flux" {
   scope = "cluster"
  
   depends_on = [
-    azurerm_kubernetes_cluster_extension.flux
+    azurerm_kubernetes_cluster_extension.flux.0
   ]
+
+  count = var.flux_enabled ? 1 : 0
 }
