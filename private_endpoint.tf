@@ -17,3 +17,13 @@ module "private_endpoint" {
   dns_resource_group          = var.dns_resource_group
   subresource_names           = ["management"]
 }
+
+resource "terraform_data" "app_routing" {
+  triggers_replace = [
+    azurerm_kubernetes_cluster.this.id,
+  ]
+
+  provisioner "local-exec" {
+    command = "az aks approuting enable -n ${azurerm_kubernetes_cluster.this.name} -g ${var.resource_group_name}"
+  }
+}
