@@ -82,6 +82,16 @@ resource "azurerm_kubernetes_cluster_node_pool" "node_pools" {
   }
 }
 
+resource "terraform_data" "app_routing" {
+  triggers_replace = [
+    azurerm_kubernetes_cluster.this.id,
+  ]
+
+  provisioner "local-exec" {
+    command = "az aks approuting enable -n ${azurerm_kubernetes_cluster.this.name} -g ${var.resource_group_name}"
+  }
+}
+
 # Roles
 
 resource "azurerm_role_assignment" "aks_vnet_reader" {
