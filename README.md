@@ -29,11 +29,6 @@ variable "tenant_id" {
   type        = string
 }
 
-variable "subscription_id" {
-  description = "Azure Subscription ID"
-  type        = string
-}
-
 variable "principal_id" {
   description = "The object id of the terraform principal (Optional). If not supplied then data.azurerm_client_config.current.object_id will be used"
   type        = string
@@ -124,7 +119,6 @@ module "aks" {
   location                  = var.location_primary
   aks_name                  = "${local.resource_prefix}-aks"
   tenant_id                 = var.tenant_id
-  subscription_id           = var.subscription_id
   principal_id              = data.azuread_service_principal.terraform.object_id
   aks_sku                   = var.aks_sku
   aks_kubernetes_version    = var.aks_kubernetes_version

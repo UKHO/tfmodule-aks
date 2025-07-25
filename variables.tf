@@ -13,12 +13,6 @@ variable "tenant_id" {
   type        = string
 }
 
-variable "subscription_id" {
-  description = "Azure Subscription ID"
-  type        = string
-  default     = null
-}
-
 variable "principal_id" {
   description = "The object id of the terraform principal (Optional). If not supplied then data.azurerm_client_config.current.object_id will be used"
   type        = string
