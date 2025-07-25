@@ -24,6 +24,12 @@ resource "terraform_data" "app_routing" {
   ]
 
   provisioner "local-exec" {
+    when    = create
     command = "az aks approuting enable -n ${azurerm_kubernetes_cluster.this.name} -g ${var.resource_group_name}"
+  }
+
+  provisioner "local-exec" {
+    when    = destroy
+    command = "az aks approuting disable -n ${azurerm_kubernetes_cluster.this.name} -g ${var.resource_group_name}"
   }
 }
