@@ -1,5 +1,5 @@
 resource "azurerm_kubernetes_cluster" "this" {
-  provider             = azurerm.spoke
+  provider                          = azurerm.spoke
   name                              = var.aks_name
   location                          = var.location
   resource_group_name               = var.resource_group_name
@@ -64,6 +64,7 @@ resource "azurerm_kubernetes_cluster" "this" {
 resource "azurerm_kubernetes_cluster_node_pool" "node_pools" {
   for_each = { for i, s in var.user_node_pools : i => s } 
 
+  provider              = azurerm.spoke
   name                  = each.value.name
   vm_size               = each.value.vm_size
   vnet_subnet_id        = data.azurerm_subnet.aks.id
@@ -97,6 +98,7 @@ resource "terraform_data" "app_routing" {
 # Roles
 
 resource "azurerm_role_assignment" "aks_vnet_reader" {
+  provider             = azurerm.spoke
   scope                = data.azurerm_virtual_network.this.id
   role_definition_name = "Network Contributor"
   principal_id         = azurerm_kubernetes_cluster.this.identity[0].principal_id

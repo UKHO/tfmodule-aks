@@ -16,4 +16,11 @@ terraform {
 provider "azurerm" {
   # TODO - Remove
     features {}
+    alias = "spoke"
+}
+
+provider "azurerm" {
+  # TODO - Remove
+    features {}
+    alias = "hub"
 }
