@@ -12,15 +12,3 @@ terraform {
 
   required_version = ">= 1.12.1"
 }
-
-provider "azurerm" {
-  # TODO - Remove
-    features {}
-    alias = "spoke"
-}
-
-provider "azurerm" {
-  # TODO - Remove
-    features {}
-    alias = "hub"
-}
