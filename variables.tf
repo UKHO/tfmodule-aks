@@ -256,3 +256,6 @@ variable "dns_zone_name" {
     error_message = "The dns_zone_name variable must be supplied"
   }
 }
+
+  }
+}
