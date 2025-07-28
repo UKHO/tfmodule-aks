@@ -15,4 +15,5 @@ terraform {
 
 provider "azurerm" {
   # TODO - Remove
+    features {}
 }
