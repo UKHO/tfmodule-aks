@@ -1,7 +1,7 @@
 module "private_endpoint" {
   source    = "github.com/UKHO/tfmodule-azure-private-endpoint-private-link?ref=0.7.0"
   providers = {
-    azurerm.spoke = azurerm
+    azurerm.spoke = azurerm.spoke
     azurerm.hub   = azurerm.hub
   }
 
