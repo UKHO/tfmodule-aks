@@ -1,4 +1,5 @@
 resource "azurerm_kubernetes_cluster_extension" "flux" {
+  provider       = azurerm.spoke
   name           = "flux"
   cluster_id     = azurerm_kubernetes_cluster.this.id
   extension_type = "microsoft.flux"
@@ -7,6 +8,7 @@ resource "azurerm_kubernetes_cluster_extension" "flux" {
 }
 
 resource "azurerm_kubernetes_flux_configuration" "flux" {
+  provider   = azurerm.spoke
   name       = "flux-system"
   cluster_id = azurerm_kubernetes_cluster.this.id
   namespace  = "flux-system"

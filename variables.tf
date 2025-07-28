@@ -1,31 +1,34 @@
 variable "resource_group_name" {
   description = "Name of the resource group"
   type        = string
+
+  validation {
+    condition     = length(var.resource_group_name) > 0
+    error_message = "The vnet_resource_group_name variable must be supplied"
+  }
 }
 
 variable "location" {
   description = "Azure region"
   type        = string
+
+  validation {
+    condition     = length(var.location) > 0
+    error_message = "The location variable must be supplied"
+  }
 }
 
 variable "tenant_id" {
   description = "Azure Tenant ID"
   type        = string
+
+  validation {
+    condition     = length(var.tenant_id) > 0
+    error_message = "The tenant_id variable must be supplied"
+  }
 }
 
-variable "subscription_id" {
-  description = "Azure Subscription ID"
-  type        = string
-  default     = null
-}
-
-variable "principal_id" {
-  description = "The object id of the terraform principal (Optional). If not supplied then data.azurerm_client_config.current.object_id will be used"
-  type        = string
-  default     = null
-}
-
-variable "aks_name" { 
+variable "aks_name" {
   type = string
 
   validation {
@@ -34,7 +37,7 @@ variable "aks_name" {
   }
 }
 
-variable "aks_sku" { 
+variable "aks_sku" {
   type = string
 
   validation {
@@ -43,30 +46,12 @@ variable "aks_sku" {
   }
 }
 
-variable "aks_kubernetes_version" { 
+variable "aks_kubernetes_version" {
   type = string
 
   validation {
     condition     = length(var.aks_kubernetes_version) > 0
     error_message = "The aks_kubernetes_version variable must be supplied"
-  }
-}
-
-variable "vnet_id" { 
-  type = string
-
-  validation {
-    condition     = length(var.vnet_id) > 0
-    error_message = "The vnet_id variable must be supplied"
-  }
-}
-
-variable "vnet_subnet_id" { 
-  type = string
-
-  validation {
-    condition     = length(var.vnet_subnet_id) > 0
-    error_message = "The vnet_subnet_id variable must be supplied"
   }
 }
 
@@ -174,6 +159,34 @@ variable "aks_use_spot" {
   default     = false
 }
 
+variable "vnet_name" {
+  type = string
+
+  validation {
+    condition     = length(var.vnet_name) > 0
+    error_message = "The vnet_name variable must be supplied"
+  }
+}
+
+variable "vnet_resource_group_name" {
+  type    = string
+  default = "m-spokeconfig-rg"
+
+  validation {
+    condition     = length(var.vnet_resource_group_name) > 0
+    error_message = "The vnet_resource_group_name variable must be supplied"
+  }
+}
+
+variable "aks_subnet_name" {
+  type = string
+
+  validation {
+    condition     = length(var.aks_subnet_name) > 0
+    error_message = "The aks_subnet_name variable must be supplied"
+  }
+}
+
 variable "tags" {
   description = "Tags for the resources"
   type        = map(string)
@@ -244,5 +257,63 @@ variable "flux_git_repository_path" {
   validation {
     condition     = (length(var.flux_git_repository_path) > 0 || var.flux_enabled == false)
     error_message = "The flux_git_repository_path variable must be supplied if Flux is enabled"
+  }
+}
+
+# PE
+
+variable "pe_enabled" {
+  description = "Enable private endpoint"
+  type        = bool
+  default     = true
+}
+
+variable "pe_environment" {
+    description = "environment for private endpoint (for example dev | prd | qa | pre)"
+    default = ""
+
+  validation {
+    condition     = var.pe_enabled == true ? length(var.pe_environment) > 0 : true
+    error_message = "The pe_environment variable must be supplied"
+  }
+}
+
+variable "pe_subnet_name" {
+  description = "subnet name that the private endpoint will associate"
+  default     = ""
+
+  validation {
+    condition     = var.pe_enabled == true ? length(var.pe_subnet_name) > 0 : true
+    error_message = "The pe_subnet_name variable must be supplied"
+  }
+}
+
+variable "dns_resource_group_name" {
+  description = "dns resource group name, please change domain-rg to either business-rg or engineering-rg"
+  default     = ""
+
+  validation {
+    condition     = var.pe_enabled == true ? length(var.dns_resource_group_name) > 0 : true
+    error_message = "The dns_resource_group_name variable must be supplied"
+  }
+}
+
+variable "dns_zone_group_name" {
+  description = "private dns zone group"
+  default     = ""
+
+  validation {
+    condition     = var.pe_enabled == true ? length(var.dns_zone_group_name) > 0 : true
+    error_message = "The dns_zone_group_name variable must be supplied"
+  }
+}
+
+variable "dns_zone_name" {
+  description = "alias to create private dns zone - be aware this is dependant on the endpoint"
+  default     = "privatelink.azurewebsites.net"
+
+  validation {
+    condition     = var.pe_enabled == true ? length(var.dns_zone_name) > 0 : true
+    error_message = "The dns_zone_name variable must be supplied"
   }
 }

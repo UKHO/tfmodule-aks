@@ -29,33 +29,15 @@ variable "tenant_id" {
   type        = string
 }
 
-variable "subscription_id" {
-  description = "Azure Subscription ID"
-  type        = string
-}
-
-variable "principal_id" {
-  description = "The object id of the terraform principal (Optional). If not supplied then data.azurerm_client_config.current.object_id will be used"
-  type        = string
-}
-
-variable "aks_name" { 
+variable "aks_name" {
   type = string
 }
 
-variable "aks_sku" { 
+variable "aks_sku" {
   type = string
 }
 
-variable "aks_kubernetes_version" { 
-  type = string
-}
-
-variable "vnet_id" { 
-  type = string
-}
-
-variable "vnet_subnet_id" { 
+variable "aks_kubernetes_version" {
   type = string
 }
 
@@ -93,17 +75,68 @@ variable "user_node_pools" {
 variable "aks_use_spot" {
   type        = bool
   description = "Should the user node pools be configured to use spot instances"
+  default     = false
+}
+
+variable "vnet_name" {
+  type = string
+}
+
+variable "vnet_resource_group_name" {
+  type    = string
+  default = "m-spokeconfig-rg"
+}
+
+variable "aks_subnet_name" {
+  type = string
+
+  validation {
+    condition     = length(var.aks_subnet_name) > 0
+    error_message = "The aks_subnet_name variable must be supplied"
+  }
 }
 
 variable "tags" {
   description = "Tags for the resources"
   type        = map(string)
+  default     = {}
 }
 
 variable "ip_rules" {
   description = "List of IP addresses that are allowed to access the AKS Cluster"
   type        = list(string)
+  default     = []
 }
+
+# PE
+
+variable "pe_enabled" {
+  description = "Enable private endpoint"
+  type        = bool
+  default     = true
+}
+
+variable "pe_environment" {
+    description = "environment for private endpoint (for example dev | prd | qa | pre)"
+}
+
+variable "pe_subnet_name" {
+  description = "subnet name that the private endpoint will associate"
+}
+
+variable "dns_resource_group_name" {
+  description = "dns resource group name, please change domain-rg to either business-rg or engineering-rg"
+}
+
+variable "dns_zone_group_name" {
+  description = "private dns zone group"
+}
+
+variable "dns_zone_name" {
+  description = "alias to create private dns zone - be aware this is dependant on the endpoint"
+  default     = "privatelink.azurewebsites.net"
+}
+
 
 Example usage: 
 
@@ -124,8 +157,6 @@ module "aks" {
   location                  = var.location_primary
   aks_name                  = "${local.resource_prefix}-aks"
   tenant_id                 = var.tenant_id
-  subscription_id           = var.subscription_id
-  principal_id              = data.azuread_service_principal.terraform.object_id
   aks_sku                   = var.aks_sku
   aks_kubernetes_version    = var.aks_kubernetes_version
   aks_system_node_vm_size   = var.aks_system_node_vm_size
