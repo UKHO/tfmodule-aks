@@ -12,3 +12,7 @@ terraform {
 
   required_version = "~> 1.12.2"
 }
+
+provider "azurerm" {
+  # TODO - Remove
+}
