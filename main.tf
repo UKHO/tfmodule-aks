@@ -99,7 +99,7 @@ resource "terraform_data" "app_routing" {
 resource "azurerm_role_assignment" "aks_vnet_reader" {
   scope                = data.azurerm_virtual_network.this.id
   role_definition_name = "Network Contributor"
-  principal_id         = data.azurerm_client_config.current.object_id
+  principal_id         = azurerm_kubernetes_cluster.this.identity[0].principal_id
 }
 
 # TODO - We need to grant permissions to the pipeline SP (not the terraform SP), so that it can do helm deploys
