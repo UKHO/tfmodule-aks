@@ -1,4 +1,5 @@
 resource "azurerm_kubernetes_cluster" "this" {
+  provider             = azurerm.spoke
   name                              = var.aks_name
   location                          = var.location
   resource_group_name               = var.resource_group_name
@@ -26,7 +27,7 @@ resource "azurerm_kubernetes_cluster" "this" {
     name                        = "systempool"
     vm_size                     = var.aks_system_node_vm_size
     os_disk_size_gb             = var.aks_system_node_disk_size
-    vnet_subnet_id              = var.vnet_subnet_id
+    vnet_subnet_id              = data.azurerm_subnet.aks.id
     type                        = "VirtualMachineScaleSets"
     auto_scaling_enabled        = true
     min_count                   = var.aks_system_node_min_count
@@ -65,7 +66,7 @@ resource "azurerm_kubernetes_cluster_node_pool" "node_pools" {
 
   name                  = each.value.name
   vm_size               = each.value.vm_size
-  vnet_subnet_id        = var.vnet_subnet_id
+  vnet_subnet_id        = data.azurerm_subnet.aks.id
   kubernetes_cluster_id = azurerm_kubernetes_cluster.this.id
   os_disk_size_gb       = each.value.disk_size
   auto_scaling_enabled  = true
@@ -82,17 +83,28 @@ resource "azurerm_kubernetes_cluster_node_pool" "node_pools" {
   }
 }
 
+resource "terraform_data" "app_routing" {
+  triggers_replace = [
+    azurerm_kubernetes_cluster.this.id,
+  ]
+
+  provisioner "local-exec" {
+    when    = create
+    command = "az aks approuting enable -n ${azurerm_kubernetes_cluster.this.name} -g ${var.resource_group_name}"
+  }
+}
+
 # Roles
 
 resource "azurerm_role_assignment" "aks_vnet_reader" {
-  scope                = var.vnet_id
+  scope                = data.azurerm_virtual_network.this.id
   role_definition_name = "Network Contributor"
-  principal_id         = azurerm_kubernetes_cluster.this.identity[0].principal_id
+  principal_id         = data.azurerm_client_config.current.object_id
 }
 
 # TODO - We need to grant permissions to the pipeline SP (not the terraform SP), so that it can do helm deploys
 # resource "azurerm_role_assignment" "pipeline_aks_cluster_admin" {
 #   scope                = azurerm_kubernetes_cluster.this.id
 #   role_definition_name = "Azure Kubernetes Service Cluster Admin Role"
-#   principal_id         = var.pipeline_principal_id # TODO - Need to decide on how we name the pipeline_principal_id variable to differentiate it from var.principal_id
+#   principal_id         = data.azurerm_client_config.current.object_id # TODO - Need to decide on how we name the pipeline_principal_id variable to differentiate it from var.principal_id
 # }
