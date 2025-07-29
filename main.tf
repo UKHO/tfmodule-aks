@@ -13,10 +13,8 @@ resource "azurerm_kubernetes_cluster" "this" {
   oidc_issuer_enabled               = true
 
   network_profile {
-    network_plugin      = "azure"
-    network_plugin_mode = "overlay"
-    network_policy      = "calico"
-    pod_cidr            = "192.168.0.0/16"
+    network_plugin    = "kubenet"
+    load_balancer_sku = "standard"
   }
 
   api_server_access_profile {
@@ -81,20 +79,6 @@ resource "azurerm_kubernetes_cluster_node_pool" "node_pools" {
 
   lifecycle {
     ignore_changes = [node_count, node_taints, node_labels, upgrade_settings]
-  }
-}
-
-resource "terraform_data" "app_routing" {
-  triggers_replace = [
-    azurerm_kubernetes_cluster.this.id,
-  ]
-
-  provisioner "local-exec" {
-    when    = create
-    command = <<-EOT
-              az login --service-principal -u $env:ARM_CLIENT_ID -p $env:ARM_CLIENT_SECRET --tenant $env:ARM_TENANT_ID
-              az aks approuting enable -n ${azurerm_kubernetes_cluster.this.name} -g ${var.resource_group_name}"
-    EOT
   }
 }
 
