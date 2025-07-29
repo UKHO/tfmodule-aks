@@ -41,8 +41,9 @@ resource "azurerm_kubernetes_cluster" "this" {
 
   web_app_routing {
     dns_zone_ids = []
+    default_ingress_controller_type = "internal"
   }
-  
+
   identity {
     type = "SystemAssigned"
   }
