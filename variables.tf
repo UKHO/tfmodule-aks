@@ -199,6 +199,8 @@ variable "ip_rules" {
   default     = []
 }
 
+# Flux
+
 variable "flux_enabled" {
   description = "Enable Flux configuration for the AKS cluster"
   type        = bool
