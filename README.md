@@ -108,6 +108,41 @@ variable "ip_rules" {
   default     = []
 }
 
+# Flux
+
+variable "flux_enabled" {
+  description = "Enable Flux configuration for the AKS cluster"
+  type        = bool
+  default     = false
+}
+
+variable "flux_git_repository_url" {
+  description = "Git repository URL for Flux configuration"
+  type        = string
+}
+
+variable "flux_git_reference_type" {
+  description = "Git reference type for Flux configuration (e.g., branch, tag)"
+  type        = string
+  default     = "branch"
+}
+
+variable "flux_git_reference_value" {
+  description = "Git reference value for Flux configuration (e.g., branch name, tag name)"
+  type        = string
+  default     = "main"
+}
+
+variable "flux_ssh_private_key_base64" {
+  description = "Base64 encoded SSH private key for Flux Git repository access"
+  type        = string
+}
+
+variable "flux_git_repository_path" {
+  description = "Path to the Flux Git repository configuration"
+  type        = string
+}
+
 # PE
 
 variable "pe_enabled" {
@@ -163,8 +198,8 @@ module "aks" {
   aks_system_node_disk_size = var.aks_system_node_disk_size
   aks_system_node_min_count = var.aks_system_node_min_count
   aks_system_node_max_count = var.aks_system_node_max_count
-  vnet_subnet_id            = data.azurerm_subnet.spoke-nodes-subnet.id
-  vnet_id                   = data.azurerm_virtual_network.spoke.id
+  aks_subnet_name           = data.azurerm_subnet.spoke-nodes-subnet.name
+  vnet_name                 = data.azurerm_virtual_network.spoke.name
   ip_rules                  = formatlist("%s/32", local.ip_rules)
   tags                      = var.tags
   user_node_pools = [{
@@ -175,4 +210,15 @@ module "aks" {
     min_count = var.aks_linux_node_min_count
     max_count = var.aks_linux_node_max_count
   }]
+
+  flux_enabled                = var.flux_enabled
+  flux_git_repository_url     = var.flux_git_repository_url
+  flux_git_reference_value    = var.flux_git_repository_branch
+  flux_git_repository_path    = var.flux_git_repository_path
+  flux_ssh_private_key_base64 = var.flux_ssh_private_key_base64
+  
+  pe_environment            = var.environment
+  pe_subnet_name            = data.azurerm_subnet.spoke-pe-subnet.name
+  dns_resource_group_name   = var.dns_resource_group
+  dns_zone_group_name       = var.zone_group
 }
