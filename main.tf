@@ -13,8 +13,11 @@ resource "azurerm_kubernetes_cluster" "this" {
   oidc_issuer_enabled               = true
 
   network_profile {
-    network_plugin    = "kubenet"
-    load_balancer_sku = "standard"
+    network_plugin      = "azure"
+    network_plugin_mode = "overlay"
+    network_policy      = "calico"
+    pod_cidr            = "192.168.0.0/16"
+    load_balancer_sku   = "standard"
   }
 
   api_server_access_profile {
