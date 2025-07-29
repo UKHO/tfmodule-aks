@@ -92,7 +92,7 @@ resource "terraform_data" "app_routing" {
   provisioner "local-exec" {
     when    = create
     command = <<-EOT
-              az login --service-principal -u $ARM_CLIENT_ID -p $ARM_CLIENT_SECRET --tenant $ARM_TENANT_ID
+              az login --service-principal -u $env:ARM_CLIENT_ID -p $env:ARM_CLIENT_SECRET --tenant $env:ARM_TENANT_ID
               az aks approuting enable -n ${azurerm_kubernetes_cluster.this.name} -g ${var.resource_group_name}"
     EOT
   }
