@@ -11,6 +11,7 @@ resource "azurerm_kubernetes_cluster" "this" {
   sku_tier                          = var.aks_sku
   workload_identity_enabled         = true
   oidc_issuer_enabled               = true
+  private_cluster_enabled           = var.pe_enabled
 
   network_profile {
     network_plugin      = "azure"
