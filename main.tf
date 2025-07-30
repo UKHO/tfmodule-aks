@@ -21,7 +21,7 @@ resource "azurerm_kubernetes_cluster" "this" {
   }
 
   api_server_access_profile {
-    authorized_ip_ranges = var.ip_rules
+    authorized_ip_ranges = var.pe_enabled ? [] : var.ip_rules
   }
 
   default_node_pool {
