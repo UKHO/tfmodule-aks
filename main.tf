@@ -1,18 +1,19 @@
 resource "azurerm_kubernetes_cluster" "this" {
-  provider                          = azurerm.spoke
-  name                              = var.aks_name
-  location                          = var.location
-  resource_group_name               = var.resource_group_name
-  kubernetes_version                = var.aks_kubernetes_version
-  azure_policy_enabled              = true
-  http_application_routing_enabled  = false
-  role_based_access_control_enabled = true
-  sku_tier                          = var.aks_sku
-  workload_identity_enabled         = true
-  oidc_issuer_enabled               = true
-  private_cluster_enabled           = var.pe_enabled
-  dns_prefix                        = var.aks_name
-  private_dns_zone_id               = var.pe_enabled ? "None" : null
+  provider                            = azurerm.spoke
+  name                                = var.aks_name
+  location                            = var.location
+  resource_group_name                 = var.resource_group_name
+  kubernetes_version                  = var.aks_kubernetes_version
+  azure_policy_enabled                = true
+  http_application_routing_enabled    = false
+  role_based_access_control_enabled   = true
+  sku_tier                            = var.aks_sku
+  workload_identity_enabled           = true
+  oidc_issuer_enabled                 = true
+  private_cluster_enabled             = var.pe_enabled
+  dns_prefix                          = var.aks_name
+  private_dns_zone_id                 = var.pe_enabled ? "None" : null
+  private_cluster_public_fqdn_enabled = var.pe_enabled
 
   network_profile {
     network_plugin      = "azure"
@@ -42,7 +43,7 @@ resource "azurerm_kubernetes_cluster" "this" {
   }
 
   web_app_routing {
-    dns_zone_ids = []
+    dns_zone_ids             = []
     default_nginx_controller = "Internal"
   }
 
@@ -69,7 +70,7 @@ resource "azurerm_kubernetes_cluster" "this" {
 }
 
 resource "azurerm_kubernetes_cluster_node_pool" "node_pools" {
-  for_each = { for i, s in var.user_node_pools : i => s } 
+  for_each = { for i, s in var.user_node_pools : i => s }
 
   provider              = azurerm.spoke
   name                  = each.value.name
