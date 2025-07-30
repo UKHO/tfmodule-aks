@@ -3,7 +3,6 @@ resource "azurerm_kubernetes_cluster" "this" {
   name                              = var.aks_name
   location                          = var.location
   resource_group_name               = var.resource_group_name
-  dns_prefix                        = var.aks_name
   kubernetes_version                = var.aks_kubernetes_version
   azure_policy_enabled              = true
   http_application_routing_enabled  = false
@@ -12,6 +11,9 @@ resource "azurerm_kubernetes_cluster" "this" {
   workload_identity_enabled         = true
   oidc_issuer_enabled               = true
   private_cluster_enabled           = var.pe_enabled
+  dns_prefix                        = var.pe_enabled ? null : var.aks_name
+  dns_prefix_private_cluster        = var.pe_enabled ? var.aks_name : null
+  private_dns_zone_id               = var.pe_enabled ? "System" : null
 
   network_profile {
     network_plugin      = "azure"
