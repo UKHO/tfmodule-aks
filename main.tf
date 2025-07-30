@@ -12,7 +12,6 @@ resource "azurerm_kubernetes_cluster" "this" {
   oidc_issuer_enabled               = true
   private_cluster_enabled           = var.pe_enabled
   dns_prefix                        = var.pe_enabled ? null : var.aks_name
-  dns_prefix_private_cluster        = var.pe_enabled ? var.aks_name : null
   private_dns_zone_id               = var.pe_enabled ? "System" : null
 
   network_profile {
