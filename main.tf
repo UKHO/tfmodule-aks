@@ -1,16 +1,19 @@
 resource "azurerm_kubernetes_cluster" "this" {
-  provider                          = azurerm.spoke
-  name                              = var.aks_name
-  location                          = var.location
-  resource_group_name               = var.resource_group_name
-  dns_prefix                        = var.aks_name
-  kubernetes_version                = var.aks_kubernetes_version
-  azure_policy_enabled              = true
-  http_application_routing_enabled  = false
-  role_based_access_control_enabled = true
-  sku_tier                          = var.aks_sku
-  workload_identity_enabled         = true
-  oidc_issuer_enabled               = true
+  provider                            = azurerm.spoke
+  name                                = var.aks_name
+  location                            = var.location
+  resource_group_name                 = var.resource_group_name
+  kubernetes_version                  = var.aks_kubernetes_version
+  azure_policy_enabled                = true
+  http_application_routing_enabled    = false
+  role_based_access_control_enabled   = true
+  sku_tier                            = var.aks_sku
+  workload_identity_enabled           = true
+  oidc_issuer_enabled                 = true
+  private_cluster_enabled             = var.pe_enabled
+  dns_prefix                          = var.aks_name
+  private_dns_zone_id                 = var.pe_enabled ? "None" : null
+  private_cluster_public_fqdn_enabled = var.pe_enabled
 
   network_profile {
     network_plugin      = "azure"
@@ -20,7 +23,7 @@ resource "azurerm_kubernetes_cluster" "this" {
   }
 
   api_server_access_profile {
-    authorized_ip_ranges = var.ip_rules
+    authorized_ip_ranges = var.pe_enabled ? [] : var.ip_rules
   }
 
   default_node_pool {
@@ -37,6 +40,11 @@ resource "azurerm_kubernetes_cluster" "this" {
     upgrade_settings {
       max_surge = "10%"
     }
+  }
+
+  web_app_routing {
+    dns_zone_ids             = []
+    default_nginx_controller = "Internal"
   }
 
   identity {
@@ -62,7 +70,7 @@ resource "azurerm_kubernetes_cluster" "this" {
 }
 
 resource "azurerm_kubernetes_cluster_node_pool" "node_pools" {
-  for_each = { for i, s in var.user_node_pools : i => s } 
+  for_each = { for i, s in var.user_node_pools : i => s }
 
   provider              = azurerm.spoke
   name                  = each.value.name
@@ -81,17 +89,6 @@ resource "azurerm_kubernetes_cluster_node_pool" "node_pools" {
 
   lifecycle {
     ignore_changes = [node_count, node_taints, node_labels, upgrade_settings]
-  }
-}
-
-resource "terraform_data" "app_routing" {
-  triggers_replace = [
-    azurerm_kubernetes_cluster.this.id,
-  ]
-
-  provisioner "local-exec" {
-    when    = create
-    command = "az aks approuting enable -n ${azurerm_kubernetes_cluster.this.name} -g ${var.resource_group_name}"
   }
 }
 
