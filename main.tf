@@ -22,8 +22,12 @@ resource "azurerm_kubernetes_cluster" "this" {
     pod_cidr            = "192.168.0.0/16"
   }
 
-  api_server_access_profile {
-    authorized_ip_ranges = var.pe_enabled ? [] : var.ip_rules
+  dynamic "api_server_access_profile" {
+    for_each = var.pe_enabled ? [] : ["apply"]
+
+    content {
+      authorized_ip_ranges = var.pe_enabled ? [] : var.ip_rules
+    }
   }
 
   default_node_pool {
@@ -56,9 +60,7 @@ resource "azurerm_kubernetes_cluster" "this" {
     secret_rotation_interval = "2m"
   }
 
-  monitor_metrics {
-
-  }
+  monitor_metrics { }
 
   storage_profile {
     blob_driver_enabled = true
