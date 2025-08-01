@@ -270,6 +270,26 @@ variable "pe_enabled" {
   default     = true
 }
 
+variable "pe_environment" {
+    description = "environment for private endpoint (for example dev | prd | qa | pre)"
+    default = ""
+
+  validation {
+    condition     = var.pe_enabled == true ? length(var.pe_environment) > 0 : true
+    error_message = "The pe_environment variable must be supplied"
+  }
+}
+
+variable "pe_subnet_name" {
+  description = "subnet name that the private endpoint will associate"
+  default     = ""
+
+  validation {
+    condition     = var.pe_enabled == true ? length(var.pe_subnet_name) > 0 : true
+    error_message = "The pe_subnet_name variable must be supplied"
+  }
+}
+
 variable "dns_resource_group_name" {
   description = "dns resource group name, please change domain-rg to either business-rg or engineering-rg"
   default     = ""
