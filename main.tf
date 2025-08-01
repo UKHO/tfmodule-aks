@@ -13,7 +13,6 @@ resource "azurerm_kubernetes_cluster" "this" {
   private_cluster_enabled             = var.pe_enabled
   dns_prefix                          = var.aks_name
   private_dns_zone_id                 = var.pe_enabled ? "privatelink.azmk8s.io" : null
-  private_cluster_public_fqdn_enabled = var.pe_enabled
 
   network_profile {
     network_plugin      = "azure"
