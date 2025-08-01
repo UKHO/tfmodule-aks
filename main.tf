@@ -52,7 +52,7 @@ resource "azurerm_kubernetes_cluster" "this" {
 
   identity {
     type = "UserAssigned"
-    identity_ids = [azurerm_user_assigned_identity.this.principal_id]
+    identity_ids = [azurerm_user_assigned_identity.this.id]
   }
 
   key_vault_secrets_provider {
