@@ -269,3 +269,13 @@ variable "pe_enabled" {
   type        = bool
   default     = true
 }
+
+variable "dns_resource_group_name" {
+  description = "dns resource group name, please change domain-rg to either business-rg or engineering-rg"
+  default     = ""
+
+  validation {
+    condition     = var.pe_enabled == true ? length(var.dns_resource_group_name) > 0 : true
+    error_message = "The dns_resource_group_name variable must be supplied"
+  }
+}
