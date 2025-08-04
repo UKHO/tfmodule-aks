@@ -20,6 +20,8 @@ resource "azurerm_kubernetes_cluster" "this" {
     network_plugin_mode = "overlay"
     network_policy      = "calico"
     pod_cidr            = "192.168.0.0/16"
+
+    load_balancer_profile { }
   }
 
   dynamic "api_server_access_profile" {
@@ -45,7 +47,7 @@ resource "azurerm_kubernetes_cluster" "this" {
       max_surge = "10%"
     }
   }
-
+  
   identity {
     type = "SystemAssigned"
   }
