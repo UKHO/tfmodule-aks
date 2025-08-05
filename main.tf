@@ -56,8 +56,8 @@ resource "azurerm_kubernetes_cluster" "this" {
   }
 
   web_app_routing {
-    dns_zone_ids             = [data.azurerm_private_dns_zone.hub.id] 
-    default_nginx_controller = "Internal"
+    dns_zone_ids             = [] 
+    default_nginx_controller = var.default_nginx_controller
   }
   
   monitor_metrics { }

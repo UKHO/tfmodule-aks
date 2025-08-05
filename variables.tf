@@ -262,15 +262,20 @@ variable "flux_git_repository_path" {
   }
 }
 
+variable "default_nginx_controller" {
+    description = "Specifies the ingress type for the default NginxIngressController custom resource. The allowed values are None, Internal, External and AnnotationControlled. It defaults to AnnotationControlled"
+    default     = "AnnotationControlled"
+
+  validation {
+    condition = contains(["None", "Internal", "External", "AnnotationControlled"],  var.default_nginx_controller)
+    error_message = "Valid values for default_nginx_controller are None, Internal, External and AnnotationControlled"
+  }
+}
+
 # PE
 
 variable "pe_enabled" {
   description = "Enable private endpoint"
   type        = bool
   default     = true
-}
-
-variable "dns_resource_group" {
-    description = "dns resource group name, please change domain-rg to either business-rg or engineering-rg"
-    default     = ""
 }
