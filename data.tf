@@ -15,6 +15,6 @@ data "azurerm_subnet" "aks" {
 
 data "azurerm_private_dns_zone" "hub" {
   provider            = azurerm.hub
-  name                = var.dns_zone_name
+  name                = "privatelink.uksouth.azmk8s.io"
   resource_group_name = var.dns_resource_group
 } 
