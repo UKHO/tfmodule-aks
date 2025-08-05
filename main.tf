@@ -48,7 +48,7 @@ resource "azurerm_kubernetes_cluster" "this" {
 
   web_app_routing {
     dns_zone_ids             = []
-    default_nginx_controller = "None"
+    default_nginx_controller = "AnnotationControlled"
   }
 
   identity {
