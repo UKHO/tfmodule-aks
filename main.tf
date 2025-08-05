@@ -55,6 +55,11 @@ resource "azurerm_kubernetes_cluster" "this" {
     secret_rotation_interval = "2m"
   }
 
+  web_app_routing {
+    dns_zone_ids             = [data.azurerm_private_dns_zone.hub.id] 
+    default_nginx_controller = "Internal"
+  }
+  
   monitor_metrics { }
 
   storage_profile {

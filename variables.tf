@@ -269,3 +269,13 @@ variable "pe_enabled" {
   type        = bool
   default     = true
 }
+
+variable "dns_resource_group" {
+    description = "dns resource group name, please change domain-rg to either business-rg or engineering-rg"
+    default     = ""
+}
+
+variable "dns_zone_name" {
+    description = "private dns zone name"
+    default     = ""
+}
