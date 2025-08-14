@@ -21,3 +21,7 @@ output "webapprouting_identity_client_id" {
 output "webapprouting_identity_principal_id" {
     value = azurerm_kubernetes_cluster.this.web_app_routing[0].web_app_routing_identity[0].object_id
 }
+
+output "kubernetes_cluster_id" {
+    value = azurerm_kubernetes_cluster.this.id
+}
