@@ -29,3 +29,7 @@ output "kubernetes_cluster_id" {
 output "oidc_issuer_url" {
     value = azurerm_kubernetes_cluster.this.oidc_issuer_url
 }
+
+output "node_resource_group_id" {
+    value = azurerm_kubernetes_cluster.this.node_resource_group_id
+}
