@@ -40,5 +40,5 @@ resource "azurerm_kubernetes_flux_configuration" "flux" {
     azurerm_kubernetes_cluster_extension.flux.0
   ]
 
-  count = var.flux_enabled ? 1 : 0
+  count = var.flux_enabled && var.apply_flux_configuration ? 1 : 0
 }

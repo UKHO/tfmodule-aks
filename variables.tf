@@ -202,9 +202,15 @@ variable "ip_rules" {
 # Flux
 
 variable "flux_enabled" {
-  description = "Enable Flux configuration for the AKS cluster"
+  description = "Enable Flux for the AKS cluster"
   type        = bool
   default     = false
+}
+
+variable "apply_flux_configuration" {
+  description = "Apply Flux configuration"
+  type        = bool
+  default     = true
 }
 
 variable "flux_git_repository_url" {
