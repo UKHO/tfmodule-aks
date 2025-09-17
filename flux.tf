@@ -26,6 +26,12 @@ resource "azurerm_kubernetes_flux_configuration" "flux" {
     sync_interval_in_seconds   = 120
     retry_interval_in_seconds  = 120
     garbage_collection_enabled = true
+
+    post_build {
+      substitute = {
+        secret_identity_client_id = azurerm_kubernetes_cluster.this.key_vault_secrets_provider[0].secret_identity[0].client_id
+      }
+    }
   }
 
   scope = "cluster"
@@ -34,5 +40,5 @@ resource "azurerm_kubernetes_flux_configuration" "flux" {
     azurerm_kubernetes_cluster_extension.flux.0
   ]
 
-  count = var.flux_enabled ? 1 : 0
+  count = var.flux_enabled && var.apply_flux_configuration ? 1 : 0
 }

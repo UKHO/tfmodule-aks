@@ -202,9 +202,15 @@ variable "ip_rules" {
 # Flux
 
 variable "flux_enabled" {
-  description = "Enable Flux configuration for the AKS cluster"
+  description = "Enable Flux for the AKS cluster"
   type        = bool
   default     = false
+}
+
+variable "apply_flux_configuration" {
+  description = "Apply Flux configuration"
+  type        = bool
+  default     = true
 }
 
 variable "flux_git_repository_url" {
@@ -213,8 +219,8 @@ variable "flux_git_repository_url" {
   default     = ""
   
   validation {
-    condition     = (length(var.flux_git_repository_url) > 0 || var.flux_enabled == false)
-    error_message = "The flux_git_repository_url variable must be supplied if Flux is enabled"
+    condition     = (length(var.flux_git_repository_url) > 0 || var.apply_flux_configuration == false)
+    error_message = "The flux_git_repository_url variable must be supplied if Flux configuration applied"
   }
 }
 
@@ -224,8 +230,8 @@ variable "flux_git_reference_type" {
   default     = "branch"
   
   validation {
-    condition     = (length(var.flux_git_reference_type) > 0 || var.flux_enabled == false)
-    error_message = "The flux_git_reference_type variable must be supplied if Flux is enabled"
+    condition     = (length(var.flux_git_reference_type) > 0 || var.apply_flux_configuration == false)
+    error_message = "The flux_git_reference_type variable must be supplied if Flux configuration applied"
   }
 }
 
@@ -235,8 +241,8 @@ variable "flux_git_reference_value" {
   default     = "main"
   
   validation {
-    condition     = (length(var.flux_git_reference_value) > 0 || var.flux_enabled == false)
-    error_message = "The flux_git_reference_value variable must be supplied if Flux is enabled"
+    condition     = (length(var.flux_git_reference_value) > 0 || var.apply_flux_configuration == false)
+    error_message = "The flux_git_reference_value variable must be supplied if Flux configuration applied"
   }
 }
 
@@ -246,8 +252,8 @@ variable "flux_ssh_private_key_base64" {
   default     = ""
   
   validation {
-    condition     = (length(var.flux_ssh_private_key_base64) > 0 || var.flux_enabled == false)
-    error_message = "The flux_ssh_private_key_base64 variable must be supplied if Flux is enabled"
+    condition     = (length(var.flux_ssh_private_key_base64) > 0 || var.apply_flux_configuration == false)
+    error_message = "The flux_ssh_private_key_base64 variable must be supplied if Flux configuration applied"
   }
 }
 
@@ -257,8 +263,8 @@ variable "flux_git_repository_path" {
   default     = ""
   
   validation {
-    condition     = (length(var.flux_git_repository_path) > 0 || var.flux_enabled == false)
-    error_message = "The flux_git_repository_path variable must be supplied if Flux is enabled"
+    condition     = (length(var.flux_git_repository_path) > 0 || var.apply_flux_configuration == false)
+    error_message = "The flux_git_repository_path variable must be supplied if Flux configuration applied"
   }
 }
 
