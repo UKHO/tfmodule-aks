@@ -3,6 +3,7 @@ resource "azurerm_kubernetes_cluster_extension" "flux" {
   name           = "flux"
   cluster_id     = azurerm_kubernetes_cluster.this.id
   extension_type = "microsoft.flux"
+  version        = "1.17.3"
 
   count = var.flux_enabled ? 1 : 0
 }
