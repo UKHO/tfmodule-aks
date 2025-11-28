@@ -30,6 +30,17 @@ resource "azurerm_kubernetes_cluster" "this" {
     }
   }
 
+  dynamic "service_mesh_profile" {
+    for_each = var.istio_enabled ? [1] : []
+
+    content {
+      mode = "Istio"
+      revisions = var.istio_revisions
+      internal_ingress_gateway_enabled = var.istio_internal_ingress_gateway_enabled
+      external_ingress_gateway_enabled = var.istio_external_ingress_gateway_enabled
+    }
+  }
+
   default_node_pool {
     name                        = "systempool"
     vm_size                     = var.aks_system_node_vm_size

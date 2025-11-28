@@ -199,6 +199,32 @@ variable "ip_rules" {
   default     = []
 }
 
+# Istio
+
+variable "istio_enabled" {
+  description = "Enable Istio for the AKS cluster"
+  type        = bool
+  default     = false
+}
+
+variable "istio_internal_ingress_gateway_enabled" {
+  description = "Enable internal ingress gateway for Istio in the AKS cluster"
+  type        = bool
+  default     = true
+}
+
+variable "istio_external_ingress_gateway_enabled" {
+  description = "Enable external ingress gateway for Istio in the AKS cluster"
+  type        = bool
+  default     = false
+}
+
+variable "istio_revisions" {
+  description = "List of Istio/ASM revisions to enable on the AKS service mesh profile (e.g., ['asm-1-27'])."
+  type        = list(string)
+  default     = ["asm-1-27"]
+}
+
 # Flux
 
 variable "flux_enabled" {
