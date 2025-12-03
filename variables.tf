@@ -225,6 +225,42 @@ variable "istio_revisions" {
   default     = ["asm-1-27"]
 }
 
+variable "istio_certificate_authority_enabled" {
+  description = "Enable custom certificate authority for Istio service mesh"
+  type        = bool
+  default     = false
+}
+
+variable "istio_ca_key_vault_id" {
+  description = "Key Vault ID containing the certificate authority for Istio"
+  type        = string
+  default     = ""
+}
+
+variable "istio_ca_cert_chain_object_name" {
+  description = "Name of the certificate chain object in Key Vault"
+  type        = string
+  default     = ""
+}
+
+variable "istio_ca_cert_object_name" {
+  description = "Name of the certificate object in Key Vault"
+  type        = string
+  default     = ""
+}
+
+variable "istio_ca_key_object_name" {
+  description = "Name of the key object in Key Vault"
+  type        = string
+  default     = ""
+}
+
+variable "istio_ca_root_cert_object_name" {
+  description = "Name of the root certificate object in Key Vault"
+  type        = string
+  default     = ""
+}
+
 # Flux
 
 variable "flux_enabled" {
