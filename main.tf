@@ -57,9 +57,13 @@ resource "azurerm_kubernetes_cluster" "this" {
     }
   }
 
-  web_app_routing {
-    dns_zone_ids             = []
-    default_nginx_controller = "None"
+  dynamic "web_app_routing" {
+    for_each = var.web_app_routing_enabled ? [1] : []
+
+    content {
+      dns_zone_ids             = []
+      default_nginx_controller = "None"
+    }
   }
 
   identity {

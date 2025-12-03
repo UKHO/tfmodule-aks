@@ -301,3 +301,11 @@ variable "pe_enabled" {
   type        = bool
   default     = true
 }
+
+# Web App Routing
+
+variable "web_app_routing_enabled" {
+  description = "Enable web app routing (application routing addon) for the AKS cluster"
+  type        = bool
+  default     = true
+}
