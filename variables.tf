@@ -199,6 +199,68 @@ variable "ip_rules" {
   default     = []
 }
 
+# Istio
+
+variable "istio_enabled" {
+  description = "Enable Istio for the AKS cluster"
+  type        = bool
+  default     = false
+}
+
+variable "istio_internal_ingress_gateway_enabled" {
+  description = "Enable internal ingress gateway for Istio in the AKS cluster"
+  type        = bool
+  default     = true
+}
+
+variable "istio_external_ingress_gateway_enabled" {
+  description = "Enable external ingress gateway for Istio in the AKS cluster"
+  type        = bool
+  default     = false
+}
+
+variable "istio_revisions" {
+  description = "List of Istio/ASM revisions to enable on the AKS service mesh profile (e.g., ['asm-1-27'])."
+  type        = list(string)
+  default     = ["asm-1-27"]
+}
+
+variable "istio_certificate_authority_enabled" {
+  description = "Enable custom certificate authority for Istio service mesh"
+  type        = bool
+  default     = false
+}
+
+variable "istio_ca_key_vault_id" {
+  description = "Key Vault ID containing the certificate authority for Istio"
+  type        = string
+  default     = ""
+}
+
+variable "istio_ca_cert_chain_object_name" {
+  description = "Name of the certificate chain object in Key Vault"
+  type        = string
+  default     = ""
+}
+
+variable "istio_ca_cert_object_name" {
+  description = "Name of the certificate object in Key Vault"
+  type        = string
+  default     = ""
+}
+
+variable "istio_ca_key_object_name" {
+  description = "Name of the key object in Key Vault"
+  type        = string
+  default     = ""
+}
+
+variable "istio_ca_root_cert_object_name" {
+  description = "Name of the root certificate object in Key Vault"
+  type        = string
+  default     = ""
+}
+
 # Flux
 
 variable "flux_enabled" {
@@ -272,6 +334,14 @@ variable "flux_git_repository_path" {
 
 variable "pe_enabled" {
   description = "Enable private endpoint"
+  type        = bool
+  default     = true
+}
+
+# Web App Routing
+
+variable "web_app_routing_enabled" {
+  description = "Enable web app routing (application routing addon) for the AKS cluster"
   type        = bool
   default     = true
 }

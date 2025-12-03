@@ -30,6 +30,29 @@ resource "azurerm_kubernetes_cluster" "this" {
     }
   }
 
+  dynamic "service_mesh_profile" {
+    for_each = var.istio_enabled ? [1] : []
+
+    content {
+      mode = "Istio"
+      revisions = var.istio_revisions
+      internal_ingress_gateway_enabled = var.istio_internal_ingress_gateway_enabled
+      external_ingress_gateway_enabled = var.istio_external_ingress_gateway_enabled
+
+      dynamic "certificate_authority" {
+        for_each = var.istio_certificate_authority_enabled ? [1] : []
+
+        content {
+          key_vault_id                = var.istio_ca_key_vault_id
+          root_cert_object_name       = var.istio_ca_root_cert_object_name
+          cert_chain_object_name      = var.istio_ca_cert_chain_object_name
+          cert_object_name            = var.istio_ca_cert_object_name
+          key_object_name             = var.istio_ca_key_object_name
+        }
+      }
+    }
+  }
+
   default_node_pool {
     name                        = "systempool"
     vm_size                     = var.aks_system_node_vm_size
@@ -46,9 +69,13 @@ resource "azurerm_kubernetes_cluster" "this" {
     }
   }
 
-  web_app_routing {
-    dns_zone_ids             = []
-    default_nginx_controller = "None"
+  dynamic "web_app_routing" {
+    for_each = var.web_app_routing_enabled ? [1] : []
+
+    content {
+      dns_zone_ids             = []
+      default_nginx_controller = "None"
+    }
   }
 
   identity {
