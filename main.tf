@@ -123,7 +123,7 @@ resource "azurerm_kubernetes_cluster_node_pool" "node_pools" {
   dynamic "windows_profile" {
     for_each = each.value.os_type == "Windows" ? [1] : [] 
     content {
-      outbound_nat_enabled = true
+      outbound_nat_enabled = null
     }
   }
 }
