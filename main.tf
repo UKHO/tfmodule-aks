@@ -119,6 +119,13 @@ resource "azurerm_kubernetes_cluster_node_pool" "node_pools" {
   lifecycle {
     ignore_changes = [node_count, node_taints, node_labels, upgrade_settings]
   }
+
+  dynamic "windows_profile" {
+    for_each = each.value.os_type == "Windows" ? [1] : [] 
+    content {
+      outbound_nat_enabled = true
+    }
+  }
 }
 
 # Roles
