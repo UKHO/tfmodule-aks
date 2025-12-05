@@ -117,14 +117,7 @@ resource "azurerm_kubernetes_cluster_node_pool" "node_pools" {
   eviction_policy       = var.aks_use_spot ? "Delete" : null
 
   lifecycle {
-    ignore_changes = [node_count, node_taints, node_labels, upgrade_settings]
-  }
-
-  dynamic "windows_profile" {
-    for_each = each.value.os_type == "Windows" ? [1] : [] 
-    content {
-      outbound_nat_enabled = null
-    }
+    ignore_changes = [node_count, node_taints, node_labels, upgrade_settings, windows_profile]
   }
 }
 
