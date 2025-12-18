@@ -8,10 +8,11 @@ data "azurerm_key_vault" "kms" {
 resource "azurerm_key_vault_key" "kms" {
   count = length(var.kms_key_vault_id) > 0 ? 1 : 0
 
-  name         = "${var.aks_name}-kms-key"
-  key_vault_id = var.kms_key_vault_id
-  key_type     = "RSA"
-  key_size     = 2048
+  name            = "${var.aks_name}-kms-key"
+  key_vault_id    = var.kms_key_vault_id
+  key_type        = "RSA"
+  key_size        = 2048
+  expiration_date = timeadd(timestamp(), "87600h")
 
   key_opts = [
     "decrypt",
@@ -21,6 +22,10 @@ resource "azurerm_key_vault_key" "kms" {
     "verify",
     "wrapKey",
   ]
+
+  lifecycle {
+    ignore_changes = [expiration_date]
+  }
 }
 
 locals {
