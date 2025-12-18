@@ -7,6 +7,7 @@ resource "azurerm_kubernetes_cluster" "this" {
   azure_policy_enabled                = true
   http_application_routing_enabled    = false
   role_based_access_control_enabled   = true
+  local_account_disabled              = true
   sku_tier                            = var.aks_sku
   workload_identity_enabled           = true
   oidc_issuer_enabled                 = true
@@ -63,6 +64,7 @@ resource "azurerm_kubernetes_cluster" "this" {
     min_count                   = var.aks_system_node_min_count
     max_count                   = var.aks_system_node_max_count
     temporary_name_for_rotation = "tmpnodepool"
+    host_encryption_enabled     = true
 
     upgrade_settings {
       max_surge = "10%"
@@ -87,6 +89,15 @@ resource "azurerm_kubernetes_cluster" "this" {
     secret_rotation_interval = "2m"
   }
 
+  dynamic "key_management_service" {
+    for_each = length(var.kms_key_vault_id) > 0 ? [1] : []
+
+    content {
+      key_vault_key_id         = local.kms_key_id
+      key_vault_network_access = local.kms_network_access
+    }
+  }
+
   monitor_metrics { }
 
   storage_profile {
@@ -101,20 +112,21 @@ resource "azurerm_kubernetes_cluster" "this" {
 resource "azurerm_kubernetes_cluster_node_pool" "node_pools" {
   for_each = { for i, s in var.user_node_pools : i => s }
 
-  provider              = azurerm.spoke
-  name                  = each.value.name
-  vm_size               = each.value.vm_size
-  vnet_subnet_id        = data.azurerm_subnet.aks.id
-  kubernetes_cluster_id = azurerm_kubernetes_cluster.this.id
-  os_disk_size_gb       = each.value.disk_size
-  auto_scaling_enabled  = true
-  min_count             = each.value.min_count
-  max_count             = each.value.max_count
-  node_count            = each.value.min_count
-  os_type               = each.value.os_type
-  priority              = var.aks_use_spot ? "Spot" : "Regular"
-  spot_max_price        = var.aks_use_spot ? -1 : null
-  eviction_policy       = var.aks_use_spot ? "Delete" : null
+  provider                = azurerm.spoke
+  name                    = each.value.name
+  vm_size                 = each.value.vm_size
+  vnet_subnet_id          = data.azurerm_subnet.aks.id
+  kubernetes_cluster_id   = azurerm_kubernetes_cluster.this.id
+  os_disk_size_gb         = each.value.disk_size
+  auto_scaling_enabled    = true
+  min_count               = each.value.min_count
+  max_count               = each.value.max_count
+  node_count              = each.value.min_count
+  os_type                 = each.value.os_type
+  priority                = var.aks_use_spot ? "Spot" : "Regular"
+  spot_max_price          = var.aks_use_spot ? -1 : null
+  eviction_policy         = var.aks_use_spot ? "Delete" : null
+  host_encryption_enabled = true
 
   lifecycle {
     ignore_changes = [node_count, node_taints, node_labels, upgrade_settings, windows_profile]

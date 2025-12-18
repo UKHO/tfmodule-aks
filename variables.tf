@@ -345,3 +345,11 @@ variable "web_app_routing_enabled" {
   type        = bool
   default     = true
 }
+
+# KMS
+
+variable "kms_key_vault_id" {
+  description = "Key Vault ID for KMS encryption. If supplied, an encryption key will be created for AKS."
+  type        = string
+  default     = ""
+}
