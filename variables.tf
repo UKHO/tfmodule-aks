@@ -358,4 +358,9 @@ variable "api_server_subnet_id" {
   description = "Subnet ID for API Server VNet Integration. Required when using private Key Vault with KMS."
   type        = string
   default     = ""
+
+  validation {
+    condition = length(var.api_server_subnet_id) > 0 || length(var.kms_key_vault_id) == 0
+    error_message = "api_server_subnet_id is required when kms_key_vault_id is provided and the KeyVault has private network access."
+  }
 }
