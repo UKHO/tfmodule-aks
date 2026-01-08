@@ -1,5 +1,5 @@
 output "identity_principal_id" {
-    value = azurerm_kubernetes_cluster.this.identity[0].principal_id
+    value = length(var.kms_key_vault_id) > 0 && local.kms_network_access == "Private" ? azurerm_user_assigned_identity.aks[0].principal_id : azurerm_kubernetes_cluster.this.identity[0].principal_id
 }
 
 output "secret_identity_principal_id" {
@@ -32,4 +32,12 @@ output "oidc_issuer_url" {
 
 output "node_resource_group_id" {
     value = azurerm_kubernetes_cluster.this.node_resource_group_id
+}
+
+output "user_assigned_identity_id" {
+    value = length(var.kms_key_vault_id) > 0 && local.kms_network_access == "Private" ? azurerm_user_assigned_identity.aks[0].id : null
+}
+
+output "user_assigned_identity_principal_id" {
+    value = length(var.kms_key_vault_id) > 0 && local.kms_network_access == "Private" ? azurerm_user_assigned_identity.aks[0].principal_id : null
 }

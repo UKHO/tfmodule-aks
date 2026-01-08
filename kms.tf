@@ -5,6 +5,15 @@ data "azurerm_key_vault" "kms" {
   resource_group_name = split("/", var.kms_key_vault_id)[4]
 }
 
+# User-Assigned Managed Identity for API Server VNet Integration
+resource "azurerm_user_assigned_identity" "aks" {
+  count = length(var.kms_key_vault_id) > 0 && local.kms_network_access == "Private" ? 1 : 0
+
+  location            = var.location
+  name                = "${var.aks_name}-identity"
+  resource_group_name = var.resource_group_name
+}
+
 resource "azurerm_key_vault_key" "kms" {
   count = length(var.kms_key_vault_id) > 0 ? 1 : 0
 
@@ -31,4 +40,13 @@ resource "azurerm_key_vault_key" "kms" {
 locals {
   kms_key_id         = length(var.kms_key_vault_id) > 0 ? azurerm_key_vault_key.kms[0].id : ""
   kms_network_access = length(var.kms_key_vault_id) > 0 ? (data.azurerm_key_vault.kms[0].public_network_access_enabled ? "Public" : "Private") : "Public"
+}
+
+# Key Vault access for User-Assigned Managed Identity when VNet integration is enabled
+resource "azurerm_role_assignment" "kms_key_vault_crypto" {
+  count = length(var.kms_key_vault_id) > 0 && local.kms_network_access == "Private" ? 1 : 0
+
+  scope                = var.kms_key_vault_id
+  role_definition_name = "Key Vault Crypto Officer"
+  principal_id         = azurerm_user_assigned_identity.aks[0].principal_id
 }

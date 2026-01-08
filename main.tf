@@ -79,7 +79,8 @@ resource "azurerm_kubernetes_cluster" "this" {
   }
 
   identity {
-    type = "SystemAssigned"
+    type = length(var.kms_key_vault_id) > 0 && local.kms_network_access == "Private" ? "UserAssigned" : "SystemAssigned"
+    identity_ids = length(var.kms_key_vault_id) > 0 && local.kms_network_access == "Private" ? [azurerm_user_assigned_identity.aks[0].id] : null
   }
 
   key_vault_secrets_provider {
@@ -137,7 +138,7 @@ resource "azurerm_role_assignment" "aks_vnet_reader" {
   provider             = azurerm.spoke
   scope                = data.azurerm_virtual_network.this.id
   role_definition_name = "Network Contributor"
-  principal_id         = azurerm_kubernetes_cluster.this.identity[0].principal_id
+  principal_id         = length(var.kms_key_vault_id) > 0 && local.kms_network_access == "Private" ? azurerm_user_assigned_identity.aks[0].principal_id : azurerm_kubernetes_cluster.this.identity[0].principal_id
 }
 
 # TODO - We need to grant permissions to the pipeline SP (not the terraform SP), so that it can do helm deploys
