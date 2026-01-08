@@ -353,3 +353,9 @@ variable "kms_key_vault_id" {
   type        = string
   default     = ""
 }
+
+variable "api_server_subnet_id" {
+  description = "Subnet ID for API Server VNet Integration. Required when using private Key Vault with KMS."
+  type        = string
+  default     = ""
+}

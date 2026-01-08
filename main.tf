@@ -23,12 +23,9 @@ resource "azurerm_kubernetes_cluster" "this" {
     pod_cidr            = "192.168.0.0/16"
   }
 
-  dynamic "api_server_access_profile" {
-    for_each = var.pe_enabled ? [] : ["apply"]
-
-    content {
-      authorized_ip_ranges = var.pe_enabled ? [] : var.ip_rules
-    }
+  api_server_access_profile {
+    authorized_ip_ranges = var.ip_rules
+    subnet_id = var.api_server_subnet_id
   }
 
   dynamic "service_mesh_profile" {
