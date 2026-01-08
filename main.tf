@@ -106,6 +106,10 @@ resource "azurerm_kubernetes_cluster" "this" {
   lifecycle {
     ignore_changes = [tags, microsoft_defender]
   }
+
+  depends_on = [
+    azurerm_role_assignment.aks_subnet_network_contributor
+  ]
 }
 
 resource "azurerm_kubernetes_cluster_node_pool" "node_pools" {
