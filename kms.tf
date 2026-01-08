@@ -50,3 +50,14 @@ resource "azurerm_role_assignment" "kms_key_vault_crypto" {
   role_definition_name = "Key Vault Crypto Officer"
   principal_id         = azurerm_user_assigned_identity.aks[0].principal_id
 }
+
+# Network Contributor access for User-Assigned Managed Identity over the AKS subnet
+resource "azurerm_role_assignment" "aks_subnet_network_contributor" {
+  count = length(var.kms_key_vault_id) > 0 && local.kms_network_access == "Private" ? 1 : 0
+
+  scope                = data.azurerm_subnet.aks.id
+  role_definition_name = "Network Contributor"
+  principal_id         = azurerm_user_assigned_identity.aks[0].principal_id
+
+  depends_on = [azurerm_user_assigned_identity.aks]
+}
