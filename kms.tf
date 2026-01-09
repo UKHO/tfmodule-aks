@@ -5,15 +5,6 @@ data "azurerm_key_vault" "kms" {
   resource_group_name = split("/", var.kms_key_vault_id)[4]
 }
 
-# User-Assigned Managed Identity for API Server VNet Integration
-resource "azurerm_user_assigned_identity" "aks" {
-  count = length(var.kms_key_vault_id) > 0 && local.kms_network_access == "Private" ? 1 : 0
-
-  location            = var.location
-  name                = "${var.aks_name}-identity"
-  resource_group_name = var.resource_group_name
-}
-
 resource "azurerm_key_vault_key" "kms" {
   count = length(var.kms_key_vault_id) > 0 ? 1 : 0
 
@@ -48,7 +39,7 @@ resource "azurerm_role_assignment" "kms_key_vault_crypto" {
 
   scope                = var.kms_key_vault_id
   role_definition_name = "Key Vault Crypto Officer"
-  principal_id         = azurerm_user_assigned_identity.aks[0].principal_id
+  principal_id         = azurerm_user_assigned_identity.aks.principal_id
 }
 
 # Network Contributor access for User-Assigned Managed Identity over the AKS subnet
@@ -57,7 +48,7 @@ resource "azurerm_role_assignment" "aks_subnet_network_contributor" {
 
   scope                = data.azurerm_subnet.aks.id
   role_definition_name = "Network Contributor"
-  principal_id         = azurerm_user_assigned_identity.aks[0].principal_id
+  principal_id         = azurerm_user_assigned_identity.aks.principal_id
 
   depends_on = [azurerm_user_assigned_identity.aks]
 }

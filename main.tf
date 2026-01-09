@@ -1,3 +1,10 @@
+# User-Assigned Managed Identity for API Server VNet Integration
+resource "azurerm_user_assigned_identity" "aks" {
+  location            = var.location
+  name                = "${var.aks_name}-identity"
+  resource_group_name = var.resource_group_name
+}
+
 resource "azurerm_kubernetes_cluster" "this" {
   provider                            = azurerm.spoke
   name                                = var.aks_name
@@ -79,8 +86,8 @@ resource "azurerm_kubernetes_cluster" "this" {
   }
 
   identity {
-    type = length(var.kms_key_vault_id) > 0 && local.kms_network_access == "Private" ? "UserAssigned" : "SystemAssigned"
-    identity_ids = length(var.kms_key_vault_id) > 0 && local.kms_network_access == "Private" ? [azurerm_user_assigned_identity.aks[0].id] : null
+    type = "UserAssigned"
+    identity_ids = [azurerm_user_assigned_identity.aks.id]
   }
 
   key_vault_secrets_provider {
@@ -142,7 +149,7 @@ resource "azurerm_role_assignment" "aks_vnet_reader" {
   provider             = azurerm.spoke
   scope                = data.azurerm_virtual_network.this.id
   role_definition_name = "Network Contributor"
-  principal_id         = length(var.kms_key_vault_id) > 0 && local.kms_network_access == "Private" ? azurerm_user_assigned_identity.aks[0].principal_id : azurerm_kubernetes_cluster.this.identity[0].principal_id
+  principal_id         = azurerm_user_assigned_identity.aks.principal_id
 }
 
 # TODO - We need to grant permissions to the pipeline SP (not the terraform SP), so that it can do helm deploys

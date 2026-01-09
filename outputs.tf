@@ -1,5 +1,5 @@
 output "identity_principal_id" {
-    value = length(var.kms_key_vault_id) > 0 && local.kms_network_access == "Private" ? azurerm_user_assigned_identity.aks[0].principal_id : azurerm_kubernetes_cluster.this.identity[0].principal_id
+    value = azurerm_user_assigned_identity.aks.principal_id
 }
 
 output "secret_identity_principal_id" {
