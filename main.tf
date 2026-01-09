@@ -31,7 +31,7 @@ resource "azurerm_kubernetes_cluster" "this" {
   }
 
   api_server_access_profile {
-    authorized_ip_ranges                = var.ip_rules
+    # authorized_ip_ranges                = var.ip_rules
     subnet_id                           = length(var.kms_key_vault_id) > 0 && local.kms_network_access == "Private" ? var.api_server_subnet_id : null
     virtual_network_integration_enabled = length(var.kms_key_vault_id) > 0 && local.kms_network_access == "Private" ? true : null
   }
