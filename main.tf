@@ -14,7 +14,8 @@ resource "azurerm_kubernetes_cluster" "this" {
   azure_policy_enabled                = true
   http_application_routing_enabled    = false
   role_based_access_control_enabled   = true
-  local_account_disabled              = true
+  #TODO - Integrate with AAD and disable local accounts
+  local_account_disabled              = false
   sku_tier                            = var.aks_sku
   workload_identity_enabled           = true
   oidc_issuer_enabled                 = true
