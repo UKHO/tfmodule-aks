@@ -33,6 +33,26 @@ locals {
   kms_network_access = length(var.kms_key_vault_id) > 0 ? (data.azurerm_key_vault.kms[0].public_network_access_enabled ? "Public" : "Private") : "Public"
 }
 
+# Custom role for Private Endpoint connection approval
+resource "azurerm_role_definition" "private_endpoint_approval" {
+  count = length(var.kms_key_vault_id) > 0 && local.kms_network_access == "Private" ? 1 : 0
+
+  name        = "${var.aks_name}-private-endpoint-approval"
+  scope       = var.kms_key_vault_id
+  description = "Custom role for approving private endpoint connections to Key Vault"
+
+  permissions {
+    actions = [
+      "Microsoft.KeyVault/vaults/PrivateEndpointConnectionsApproval/action"
+    ]
+    not_actions = []
+  }
+
+  assignable_scopes = [
+    var.kms_key_vault_id
+  ]
+}
+
 # Key Vault access for User-Assigned Managed Identity when VNet integration is enabled
 resource "azurerm_role_assignment" "kms_key_vault_crypto" {
   count = length(var.kms_key_vault_id) > 0 && local.kms_network_access == "Private" ? 1 : 0
@@ -40,6 +60,46 @@ resource "azurerm_role_assignment" "kms_key_vault_crypto" {
   scope                = var.kms_key_vault_id
   role_definition_name = "Key Vault Crypto Officer"
   principal_id         = azurerm_user_assigned_identity.aks.principal_id
+}
+
+# Key Vault Administrator access for Private Endpoint connection approval
+# resource "azurerm_role_assignment" "kms_key_vault_admin" {
+#   count = length(var.kms_key_vault_id) > 0 && local.kms_network_access == "Private" ? 1 : 0
+
+#   scope                = var.kms_key_vault_id
+#   role_definition_name = "Key Vault Administrator"
+#   principal_id         = azurerm_user_assigned_identity.aks.principal_id
+# }
+
+# Custom role for Private Endpoint connection approval
+resource "azurerm_role_definition" "private_endpoint_approval" {
+  count = length(var.kms_key_vault_id) > 0 && local.kms_network_access == "Private" ? 1 : 0
+
+  name        = "${var.aks_name}-private-endpoint-approval"
+  scope       = var.kms_key_vault_id
+  description = "Custom role for approving private endpoint connections to Key Vault"
+
+  permissions {
+    actions = [
+      "Microsoft.KeyVault/vaults/PrivateEndpointConnectionsApproval/action"
+    ]
+    not_actions = []
+  }
+
+  assignable_scopes = [
+    var.kms_key_vault_id
+  ]
+}
+
+# Alternative: Use custom role for private endpoint approval (comment out the admin role assignment above if using this)
+resource "azurerm_role_assignment" "kms_private_endpoint_approval" {
+  count = length(var.kms_key_vault_id) > 0 && local.kms_network_access == "Private" ? 1 : 0
+
+  scope                = var.kms_key_vault_id
+  role_definition_id   = azurerm_role_definition.private_endpoint_approval[0].role_definition_resource_id
+  principal_id         = azurerm_user_assigned_identity.aks.principal_id
+
+  depends_on = [azurerm_role_definition.private_endpoint_approval]
 }
 
 # Network Contributor access for User-Assigned Managed Identity over the AKS subnet
