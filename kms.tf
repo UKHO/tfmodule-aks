@@ -33,26 +33,6 @@ locals {
   kms_network_access = length(var.kms_key_vault_id) > 0 ? (data.azurerm_key_vault.kms[0].public_network_access_enabled ? "Public" : "Private") : "Public"
 }
 
-# Custom role for Private Endpoint connection approval
-resource "azurerm_role_definition" "private_endpoint_approval" {
-  count = length(var.kms_key_vault_id) > 0 && local.kms_network_access == "Private" ? 1 : 0
-
-  name        = "${var.aks_name}-private-endpoint-approval"
-  scope       = var.kms_key_vault_id
-  description = "Custom role for approving private endpoint connections to Key Vault"
-
-  permissions {
-    actions = [
-      "Microsoft.KeyVault/vaults/PrivateEndpointConnectionsApproval/action"
-    ]
-    not_actions = []
-  }
-
-  assignable_scopes = [
-    var.kms_key_vault_id
-  ]
-}
-
 # Key Vault access for User-Assigned Managed Identity when VNet integration is enabled
 resource "azurerm_role_assignment" "kms_key_vault_crypto" {
   count = length(var.kms_key_vault_id) > 0 && local.kms_network_access == "Private" ? 1 : 0
