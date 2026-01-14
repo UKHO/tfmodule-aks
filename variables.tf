@@ -97,12 +97,13 @@ variable "aks_system_node_max_count" {
 
 variable "user_node_pools" {
   type = list(object({
-    name      = string
-    os_type   = string
-    vm_size   = string
-    disk_size = number
-    min_count = number
-    max_count = number
+    name        = string
+    os_type     = string
+    vm_size     = string
+    disk_size   = number
+    min_count   = number
+    max_count   = number
+    node_labels = optional(map(string), {})
   }))
 
   validation {

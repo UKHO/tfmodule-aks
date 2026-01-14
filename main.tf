@@ -115,6 +115,7 @@ resource "azurerm_kubernetes_cluster_node_pool" "node_pools" {
   priority              = var.aks_use_spot ? "Spot" : "Regular"
   spot_max_price        = var.aks_use_spot ? -1 : null
   eviction_policy       = var.aks_use_spot ? "Delete" : null
+  node_labels           = each.value.node_labels
 
   lifecycle {
     ignore_changes = [node_count, node_taints, node_labels, upgrade_settings, windows_profile]
