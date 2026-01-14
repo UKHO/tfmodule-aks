@@ -118,7 +118,7 @@ resource "azurerm_kubernetes_cluster_node_pool" "node_pools" {
   node_labels           = each.value.os_type == "Windows" ? merge(each.value.node_labels, { "istio-injection" = "disabled" }) : each.value.node_labels
 
   lifecycle {
-    ignore_changes = [node_count, node_taints, node_labels, upgrade_settings, windows_profile]
+    ignore_changes = [node_count, node_taints, upgrade_settings, windows_profile]
   }
 }
 
