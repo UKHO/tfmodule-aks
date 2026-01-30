@@ -62,7 +62,7 @@ resource "azurerm_kubernetes_cluster" "this" {
     auto_scaling_enabled        = true
     min_count                   = var.aks_system_node_min_count
     max_count                   = var.aks_system_node_max_count
-    temporary_name_for_rotation = "tmpsystempool"
+    temporary_name_for_rotation = "tmpsystem"
 
     upgrade_settings {
       max_surge = "10%"
@@ -115,7 +115,7 @@ resource "azurerm_kubernetes_cluster_node_pool" "node_pools" {
   priority              = var.aks_use_spot ? "Spot" : "Regular"
   spot_max_price        = var.aks_use_spot ? -1 : null
   eviction_policy       = var.aks_use_spot ? "Delete" : null
-  temporary_name_for_rotation = "tmp${each.value.name}"
+  temporary_name_for_rotation = "tmp${substr(each.value.name, 0, 9)}"
 
   lifecycle {
     ignore_changes = [node_count, node_taints, node_labels, upgrade_settings, windows_profile]
