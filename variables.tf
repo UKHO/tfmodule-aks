@@ -222,7 +222,7 @@ variable "istio_external_ingress_gateway_enabled" {
 variable "istio_revisions" {
   description = "List of Istio/ASM revisions to enable on the AKS service mesh profile (e.g., ['asm-1-27'])."
   type        = list(string)
-  default     = ["asm-1-27"]
+  default     = ["asm-1-28"]
 }
 
 variable "istio_certificate_authority_enabled" {
