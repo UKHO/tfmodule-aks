@@ -128,6 +128,7 @@ resource "azurerm_role_assignment" "aks_vnet_reader" {
   provider             = azurerm.spoke
   scope                = data.azurerm_virtual_network.this.id
   role_definition_name = "Network Contributor"
+  principal_type       = "ServicePrincipal"
   principal_id         = azurerm_kubernetes_cluster.this.identity[0].principal_id
 }
 
