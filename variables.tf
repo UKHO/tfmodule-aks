@@ -330,6 +330,26 @@ variable "flux_git_repository_path" {
   }
 }
 
+# Flux image Automation controller
+
+variable "flux_image_reflector_controller_enabled" {
+  description = "Enable the image-reflector-controller in the Flux extension"
+  type        = bool
+  default     = false
+}
+
+variable "flux_image_automation_controller_enabled" {
+  description = "Enable the image-automation-controller in the Flux extension"
+  type        = bool
+  default     = false
+}
+
+variable "flux_image_automation_kustomization_path" {
+  description = "Path to the image-automation kustomization in the Flux Git repository. Only used when apply_flux_configuration is true."
+  type        = string
+  default     = ""
+}
+
 # PE
 
 variable "pe_enabled" {

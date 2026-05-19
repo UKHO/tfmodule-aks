@@ -5,6 +5,11 @@ resource "azurerm_kubernetes_cluster_extension" "flux" {
   extension_type = "microsoft.flux"
   version        = "1.18.2"
 
+  configuration_settings = {
+    "image-reflector-controller.enabled"  = tostring(var.flux_image_reflector_controller_enabled)
+    "image-automation-controller.enabled" = tostring(var.flux_image_automation_controller_enabled)
+  }
+
   count = var.flux_enabled ? 1 : 0
 }
 
@@ -32,6 +37,16 @@ resource "azurerm_kubernetes_flux_configuration" "flux" {
       substitute = {
         secret_identity_client_id = azurerm_kubernetes_cluster.this.key_vault_secrets_provider[0].secret_identity[0].client_id
       }
+    }
+  }
+
+  dynamic "kustomizations" {
+    for_each = var.flux_image_automation_controller_enabled && length(var.flux_image_automation_kustomization_path) > 0 ? [1] : []
+    content {
+      name                       = "image-automation"
+      path                       = var.flux_image_automation_kustomization_path
+      garbage_collection_enabled = true
+      sync_interval_in_seconds   = 300
     }
   }
 
