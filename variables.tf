@@ -344,6 +344,12 @@ variable "flux_image_automation_controller_enabled" {
   default     = false
 }
 
+variable "flux_extra_configuration_settings" {
+  description = "Additional configuration_settings merged into the Flux extension. Use to inject arbitrary Helm values not explicitly exposed by the module."
+  type        = map(string)
+  default     = {}
+}
+
 # PE
 
 variable "pe_enabled" {
