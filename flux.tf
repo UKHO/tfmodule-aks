@@ -5,6 +5,11 @@ resource "azurerm_kubernetes_cluster_extension" "flux" {
   extension_type = "microsoft.flux"
   version        = "1.18.2"
 
+  configuration_settings = {
+    "image-reflector-controller.enabled"  = tostring(var.flux_image_reflector_controller_enabled)
+    "image-automation-controller.enabled" = tostring(var.flux_image_automation_controller_enabled)
+  }
+
   count = var.flux_enabled ? 1 : 0
 }
 
