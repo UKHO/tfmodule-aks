@@ -40,16 +40,6 @@ resource "azurerm_kubernetes_flux_configuration" "flux" {
     }
   }
 
-  dynamic "kustomizations" {
-    for_each = var.flux_image_automation_controller_enabled && length(var.flux_image_automation_kustomization_path) > 0 ? [1] : []
-    content {
-      name                       = "image-automation"
-      path                       = var.flux_image_automation_kustomization_path
-      garbage_collection_enabled = true
-      sync_interval_in_seconds   = 300
-    }
-  }
-
   scope = "cluster"
 
   depends_on = [

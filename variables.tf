@@ -344,12 +344,6 @@ variable "flux_image_automation_controller_enabled" {
   default     = false
 }
 
-variable "flux_image_automation_kustomization_path" {
-  description = "Path to the image-automation kustomization in the Flux Git repository. Only used when apply_flux_configuration is true."
-  type        = string
-  default     = ""
-}
-
 # PE
 
 variable "pe_enabled" {
