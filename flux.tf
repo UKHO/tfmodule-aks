@@ -3,7 +3,7 @@ resource "azurerm_kubernetes_cluster_extension" "flux" {
   name           = "flux"
   cluster_id     = azurerm_kubernetes_cluster.this.id
   extension_type = "microsoft.flux"
-  version        = "1.18.2"
+  version        = var.flux_extension_version
 
   configuration_settings = {
     "image-reflector-controller.enabled"  = tostring(var.flux_image_reflector_controller_enabled)

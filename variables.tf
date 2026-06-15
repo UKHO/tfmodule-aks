@@ -269,6 +269,12 @@ variable "flux_enabled" {
   default     = false
 }
 
+variable "flux_extension_version" {
+  description = "Version of the microsoft.flux extension to install"
+  type        = string
+  default     = "1.23.0"
+}
+
 variable "apply_flux_configuration" {
   description = "Apply Flux configuration"
   type        = bool
