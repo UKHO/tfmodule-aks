@@ -220,9 +220,9 @@ variable "istio_external_ingress_gateway_enabled" {
 }
 
 variable "istio_revisions" {
-  description = "List of Istio/ASM revisions to enable on the AKS service mesh profile (e.g., ['asm-1-27'])."
+  description = "List of Istio/ASM revisions to enable on the AKS service mesh profile (e.g., ['asm-1-29'])."
   type        = list(string)
-  default     = ["asm-1-27"]
+  default     = ["asm-1-29"]
 }
 
 variable "istio_certificate_authority_enabled" {
@@ -267,6 +267,12 @@ variable "flux_enabled" {
   description = "Enable Flux for the AKS cluster"
   type        = bool
   default     = false
+}
+
+variable "flux_extension_version" {
+  description = "Version of the microsoft.flux extension to install"
+  type        = string
+  default     = "1.23.0"
 }
 
 variable "apply_flux_configuration" {
