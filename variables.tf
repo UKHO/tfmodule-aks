@@ -285,7 +285,7 @@ variable "flux_git_repository_url" {
   description = "Git repository URL for Flux configuration"
   type        = string
   default     = ""
-  
+
   validation {
     condition     = (length(var.flux_git_repository_url) > 0 || var.apply_flux_configuration == false)
     error_message = "The flux_git_repository_url variable must be supplied if Flux configuration applied"
@@ -296,7 +296,7 @@ variable "flux_git_reference_type" {
   description = "Git reference type for Flux configuration (e.g., branch, tag)"
   type        = string
   default     = "branch"
-  
+
   validation {
     condition     = (length(var.flux_git_reference_type) > 0 || var.apply_flux_configuration == false)
     error_message = "The flux_git_reference_type variable must be supplied if Flux configuration applied"
@@ -307,7 +307,7 @@ variable "flux_git_reference_value" {
   description = "Git reference value for Flux configuration (e.g., branch name, tag name)"
   type        = string
   default     = "main"
-  
+
   validation {
     condition     = (length(var.flux_git_reference_value) > 0 || var.apply_flux_configuration == false)
     error_message = "The flux_git_reference_value variable must be supplied if Flux configuration applied"
@@ -318,7 +318,7 @@ variable "flux_ssh_private_key_base64" {
   description = "Base64 encoded SSH private key for Flux Git repository access"
   type        = string
   default     = ""
-  
+
   validation {
     condition     = (length(var.flux_ssh_private_key_base64) > 0 || var.apply_flux_configuration == false)
     error_message = "The flux_ssh_private_key_base64 variable must be supplied if Flux configuration applied"
@@ -329,7 +329,7 @@ variable "flux_git_repository_path" {
   description = "Path to the Flux Git repository configuration"
   type        = string
   default     = ""
-  
+
   validation {
     condition     = (length(var.flux_git_repository_path) > 0 || var.apply_flux_configuration == false)
     error_message = "The flux_git_repository_path variable must be supplied if Flux configuration applied"
@@ -364,4 +364,23 @@ variable "web_app_routing_enabled" {
   description = "Enable web app routing (application routing addon) for the AKS cluster"
   type        = bool
   default     = true
+}
+
+# KMS
+
+variable "kms_enabled" {
+  description = "Enable AKS KMS etcd secret encryption using an external Key Vault key."
+  type        = bool
+  default     = false
+}
+
+variable "kms_key_vault_key_id" {
+  description = "Key Vault key ID used for AKS KMS secret encryption. Required when kms_enabled = true."
+  type        = string
+  default     = ""
+
+  validation {
+    condition     = var.kms_enabled == false || length(var.kms_key_vault_key_id) > 0
+    error_message = "kms_key_vault_key_id must be supplied when kms_enabled is true."
+  }
 }

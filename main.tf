@@ -34,8 +34,8 @@ resource "azurerm_kubernetes_cluster" "this" {
     for_each = var.istio_enabled ? [1] : []
 
     content {
-      mode = "Istio"
-      revisions = var.istio_revisions
+      mode                             = "Istio"
+      revisions                        = var.istio_revisions
       internal_ingress_gateway_enabled = var.istio_internal_ingress_gateway_enabled
       external_ingress_gateway_enabled = var.istio_external_ingress_gateway_enabled
 
@@ -43,11 +43,11 @@ resource "azurerm_kubernetes_cluster" "this" {
         for_each = var.istio_certificate_authority_enabled ? [1] : []
 
         content {
-          key_vault_id                = var.istio_ca_key_vault_id
-          root_cert_object_name       = var.istio_ca_root_cert_object_name
-          cert_chain_object_name      = var.istio_ca_cert_chain_object_name
-          cert_object_name            = var.istio_ca_cert_object_name
-          key_object_name             = var.istio_ca_key_object_name
+          key_vault_id           = var.istio_ca_key_vault_id
+          root_cert_object_name  = var.istio_ca_root_cert_object_name
+          cert_chain_object_name = var.istio_ca_cert_chain_object_name
+          cert_object_name       = var.istio_ca_cert_object_name
+          key_object_name        = var.istio_ca_key_object_name
         }
       }
     }
@@ -82,12 +82,21 @@ resource "azurerm_kubernetes_cluster" "this" {
     type = "SystemAssigned"
   }
 
+  dynamic "key_management_service" {
+    for_each = var.kms_enabled ? [1] : []
+
+    content {
+      key_vault_key_id         = var.kms_key_vault_key_id
+      key_vault_network_access = var.pe_enabled ? "Private" : "Public"
+    }
+  }
+
   key_vault_secrets_provider {
     secret_rotation_enabled  = true
     secret_rotation_interval = "2m"
   }
 
-  monitor_metrics { }
+  monitor_metrics {}
 
   storage_profile {
     blob_driver_enabled = true
@@ -101,20 +110,20 @@ resource "azurerm_kubernetes_cluster" "this" {
 resource "azurerm_kubernetes_cluster_node_pool" "node_pools" {
   for_each = { for i, s in var.user_node_pools : i => s }
 
-  provider              = azurerm.spoke
-  name                  = each.value.name
-  vm_size               = each.value.vm_size
-  vnet_subnet_id        = data.azurerm_subnet.aks.id
-  kubernetes_cluster_id = azurerm_kubernetes_cluster.this.id
-  os_disk_size_gb       = each.value.disk_size
-  auto_scaling_enabled  = true
-  min_count             = each.value.min_count
-  max_count             = each.value.max_count
-  node_count            = each.value.min_count
-  os_type               = each.value.os_type
-  priority              = var.aks_use_spot ? "Spot" : "Regular"
-  spot_max_price        = var.aks_use_spot ? -1 : null
-  eviction_policy       = var.aks_use_spot ? "Delete" : null
+  provider                    = azurerm.spoke
+  name                        = each.value.name
+  vm_size                     = each.value.vm_size
+  vnet_subnet_id              = data.azurerm_subnet.aks.id
+  kubernetes_cluster_id       = azurerm_kubernetes_cluster.this.id
+  os_disk_size_gb             = each.value.disk_size
+  auto_scaling_enabled        = true
+  min_count                   = each.value.min_count
+  max_count                   = each.value.max_count
+  node_count                  = each.value.min_count
+  os_type                     = each.value.os_type
+  priority                    = var.aks_use_spot ? "Spot" : "Regular"
+  spot_max_price              = var.aks_use_spot ? -1 : null
+  eviction_policy             = var.aks_use_spot ? "Delete" : null
   temporary_name_for_rotation = "tmp${substr(each.value.name, 0, 9)}"
 
   lifecycle {
