@@ -384,3 +384,14 @@ variable "kms_key_vault_key_id" {
     error_message = "kms_key_vault_key_id must be supplied when kms_enabled is true."
   }
 }
+
+variable "kms_key_vault_network_access" {
+  description = "Network access mode for the KMS key vault. Must be 'Public' unless the cluster uses API Server VNet Integration, which is required for 'Private'."
+  type        = string
+  default     = "Public"
+
+  validation {
+    condition     = contains(["Public", "Private"], var.kms_key_vault_network_access)
+    error_message = "kms_key_vault_network_access must be either 'Public' or 'Private'."
+  }
+}

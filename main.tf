@@ -87,7 +87,7 @@ resource "azurerm_kubernetes_cluster" "this" {
 
     content {
       key_vault_key_id         = var.kms_key_vault_key_id
-      key_vault_network_access = var.pe_enabled ? "Private" : "Public"
+      key_vault_network_access = var.kms_key_vault_network_access
     }
   }
 
