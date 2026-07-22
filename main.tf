@@ -1,3 +1,7 @@
+locals {
+  aks_identity_principal_id = var.kms_enabled ? var.kms_identity_principal_id : azurerm_kubernetes_cluster.this.identity[0].principal_id
+}
+
 resource "azurerm_kubernetes_cluster" "this" {
   provider                            = azurerm.spoke
   name                                = var.aks_name
@@ -79,7 +83,8 @@ resource "azurerm_kubernetes_cluster" "this" {
   }
 
   identity {
-    type = "SystemAssigned"
+    type         = var.kms_enabled ? "UserAssigned" : "SystemAssigned"
+    identity_ids = var.kms_enabled ? [var.kms_identity_id] : null
   }
 
   dynamic "key_management_service" {
@@ -138,7 +143,7 @@ resource "azurerm_role_assignment" "aks_vnet_reader" {
   scope                = data.azurerm_virtual_network.this.id
   role_definition_name = "Network Contributor"
   principal_type       = "ServicePrincipal"
-  principal_id         = azurerm_kubernetes_cluster.this.identity[0].principal_id
+  principal_id         = local.aks_identity_principal_id
 }
 
 # TODO - We need to grant permissions to the pipeline SP (not the terraform SP), so that it can do helm deploys

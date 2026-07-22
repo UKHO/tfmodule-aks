@@ -395,3 +395,25 @@ variable "kms_key_vault_network_access" {
     error_message = "kms_key_vault_network_access must be either 'Public' or 'Private'."
   }
 }
+
+variable "kms_identity_id" {
+  description = "Resource ID of the user-assigned managed identity used by AKS KMS. Required when kms_enabled = true, as KMS does not support the cluster's system-assigned identity."
+  type        = string
+  default     = ""
+
+  validation {
+    condition     = var.kms_enabled == false || length(var.kms_identity_id) > 0
+    error_message = "kms_identity_id must be supplied when kms_enabled is true."
+  }
+}
+
+variable "kms_identity_principal_id" {
+  description = "Principal (object) ID of the user-assigned managed identity used by AKS KMS. Required when kms_enabled = true."
+  type        = string
+  default     = ""
+
+  validation {
+    condition     = var.kms_enabled == false || length(var.kms_identity_principal_id) > 0
+    error_message = "kms_identity_principal_id must be supplied when kms_enabled is true."
+  }
+}
