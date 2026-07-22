@@ -388,7 +388,7 @@ variable "kms_key_vault_key_id" {
 variable "kms_key_vault_network_access" {
   description = "Network access mode for the KMS key vault. Must be 'Public' unless the cluster uses API Server VNet Integration, which is required for 'Private'."
   type        = string
-  default     = "Public"
+  default     = "Private"
 
   validation {
     condition     = contains(["Public", "Private"], var.kms_key_vault_network_access)
