@@ -30,9 +30,9 @@ resource "azurerm_kubernetes_cluster" "this" {
     for_each = var.api_server_vnet_integration_enabled || !var.pe_enabled ? ["apply"] : []
 
     content {
-      authorized_ip_ranges     = var.pe_enabled ? [] : var.ip_rules
-      vnet_integration_enabled = var.api_server_vnet_integration_enabled
-      subnet_id                = var.api_server_vnet_integration_enabled ? var.api_server_subnet_id : null
+      authorized_ip_ranges                = var.pe_enabled ? [] : var.ip_rules
+      virtual_network_integration_enabled = var.api_server_vnet_integration_enabled
+      subnet_id                           = var.api_server_vnet_integration_enabled ? var.api_server_subnet_id : null
     }
   }
 
@@ -95,7 +95,6 @@ resource "azurerm_kubernetes_cluster" "this" {
     content {
       key_vault_key_id         = var.kms_key_vault_key_id
       key_vault_network_access = var.kms_key_vault_network_access
-      key_vault_resource_id    = var.kms_key_vault_network_access == "Private" ? var.kms_key_vault_resource_id : null
     }
   }
 
