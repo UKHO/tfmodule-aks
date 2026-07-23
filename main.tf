@@ -71,7 +71,7 @@ resource "azurerm_kubernetes_cluster" "this" {
     temporary_name_for_rotation = "tmpsystem"
 
     upgrade_settings {
-      max_surge = "10%"
+      max_surge = "0"
     }
   }
 
