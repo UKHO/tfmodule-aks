@@ -434,3 +434,9 @@ variable "api_server_subnet_id" {
     error_message = "api_server_subnet_id must be supplied when api_server_vnet_integration_enabled is true."
   }
 }
+
+variable "aks_system_node_max_surge" {
+  description = "Max surge for the system node pool upgrade. Set to '0' to upgrade in-place without extra nodes (useful for quota-constrained environments)."
+  type        = string
+  default     = "10%"
+}
