@@ -417,3 +417,20 @@ variable "kms_identity_principal_id" {
     error_message = "kms_identity_principal_id must be supplied when kms_enabled is true."
   }
 }
+
+variable "api_server_vnet_integration_enabled" {
+  description = "Enable API Server VNet Integration. Required for KMS with a private key vault."
+  type        = bool
+  default     = false
+}
+
+variable "api_server_subnet_id" {
+  description = "Resource ID of the delegated subnet for the API server. Required when api_server_vnet_integration_enabled = true."
+  type        = string
+  default     = ""
+
+  validation {
+    condition     = var.api_server_vnet_integration_enabled == false || length(var.api_server_subnet_id) > 0
+    error_message = "api_server_subnet_id must be supplied when api_server_vnet_integration_enabled is true."
+  }
+}

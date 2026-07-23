@@ -27,10 +27,12 @@ resource "azurerm_kubernetes_cluster" "this" {
   }
 
   dynamic "api_server_access_profile" {
-    for_each = var.pe_enabled ? [] : ["apply"]
+    for_each = var.api_server_vnet_integration_enabled || !var.pe_enabled ? ["apply"] : []
 
     content {
-      authorized_ip_ranges = var.pe_enabled ? [] : var.ip_rules
+      authorized_ip_ranges                = var.pe_enabled ? [] : var.ip_rules
+      virtual_network_integration_enabled = var.api_server_vnet_integration_enabled
+      subnet_id                           = var.api_server_vnet_integration_enabled ? var.api_server_subnet_id : null
     }
   }
 
