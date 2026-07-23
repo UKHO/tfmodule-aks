@@ -396,6 +396,17 @@ variable "kms_key_vault_network_access" {
   }
 }
 
+variable "kms_key_vault_resource_id" {
+  description = "Resource ID of the Key Vault used for KMS. Required when kms_key_vault_network_access = 'Private'."
+  type        = string
+  default     = ""
+
+  validation {
+    condition     = var.kms_key_vault_network_access != "Private" || length(var.kms_key_vault_resource_id) > 0
+    error_message = "kms_key_vault_resource_id must be supplied when kms_key_vault_network_access is 'Private'."
+  }
+}
+
 variable "kms_identity_id" {
   description = "Resource ID of the user-assigned managed identity used by AKS KMS. Required when kms_enabled = true, as KMS does not support the cluster's system-assigned identity."
   type        = string
@@ -415,5 +426,22 @@ variable "kms_identity_principal_id" {
   validation {
     condition     = var.kms_enabled == false || length(var.kms_identity_principal_id) > 0
     error_message = "kms_identity_principal_id must be supplied when kms_enabled is true."
+  }
+}
+
+variable "api_server_vnet_integration_enabled" {
+  description = "Enable API Server VNet Integration. Required for KMS with a private key vault."
+  type        = bool
+  default     = false
+}
+
+variable "api_server_subnet_id" {
+  description = "Resource ID of the delegated subnet for the API server. Required when api_server_vnet_integration_enabled = true."
+  type        = string
+  default     = ""
+
+  validation {
+    condition     = var.api_server_vnet_integration_enabled == false || length(var.api_server_subnet_id) > 0
+    error_message = "api_server_subnet_id must be supplied when api_server_vnet_integration_enabled is true."
   }
 }
