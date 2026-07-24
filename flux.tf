@@ -10,6 +10,10 @@ resource "azurerm_kubernetes_cluster_extension" "flux" {
     "image-automation-controller.enabled" = tostring(var.flux_image_automation_controller_enabled)
   }
 
+  lifecycle {
+    ignore_changes = [configuration_settings]
+  }
+
   count = var.flux_enabled ? 1 : 0
 }
 
