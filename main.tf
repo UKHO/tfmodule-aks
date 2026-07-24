@@ -26,6 +26,8 @@ resource "azurerm_kubernetes_cluster" "this" {
     pod_cidr            = "192.168.0.0/16"
   }
 
+  # Included for public clusters (to set authorized_ip_ranges) or when vnet integration is enabled (to set subnet_id).
+  # Omitted only for private clusters without vnet integration, where AKS manages API server access internally.
   dynamic "api_server_access_profile" {
     for_each = var.api_server_vnet_integration_enabled || !var.pe_enabled ? ["apply"] : []
 
