@@ -285,7 +285,7 @@ variable "flux_git_repository_url" {
   description = "Git repository URL for Flux configuration"
   type        = string
   default     = ""
-  
+
   validation {
     condition     = (length(var.flux_git_repository_url) > 0 || var.apply_flux_configuration == false)
     error_message = "The flux_git_repository_url variable must be supplied if Flux configuration applied"
@@ -296,7 +296,7 @@ variable "flux_git_reference_type" {
   description = "Git reference type for Flux configuration (e.g., branch, tag)"
   type        = string
   default     = "branch"
-  
+
   validation {
     condition     = (length(var.flux_git_reference_type) > 0 || var.apply_flux_configuration == false)
     error_message = "The flux_git_reference_type variable must be supplied if Flux configuration applied"
@@ -307,7 +307,7 @@ variable "flux_git_reference_value" {
   description = "Git reference value for Flux configuration (e.g., branch name, tag name)"
   type        = string
   default     = "main"
-  
+
   validation {
     condition     = (length(var.flux_git_reference_value) > 0 || var.apply_flux_configuration == false)
     error_message = "The flux_git_reference_value variable must be supplied if Flux configuration applied"
@@ -318,7 +318,7 @@ variable "flux_ssh_private_key_base64" {
   description = "Base64 encoded SSH private key for Flux Git repository access"
   type        = string
   default     = ""
-  
+
   validation {
     condition     = (length(var.flux_ssh_private_key_base64) > 0 || var.apply_flux_configuration == false)
     error_message = "The flux_ssh_private_key_base64 variable must be supplied if Flux configuration applied"
@@ -329,7 +329,7 @@ variable "flux_git_repository_path" {
   description = "Path to the Flux Git repository configuration"
   type        = string
   default     = ""
-  
+
   validation {
     condition     = (length(var.flux_git_repository_path) > 0 || var.apply_flux_configuration == false)
     error_message = "The flux_git_repository_path variable must be supplied if Flux configuration applied"
@@ -364,4 +364,73 @@ variable "web_app_routing_enabled" {
   description = "Enable web app routing (application routing addon) for the AKS cluster"
   type        = bool
   default     = true
+}
+
+# KMS
+
+variable "kms_enabled" {
+  description = "Enable AKS KMS etcd secret encryption using an external Key Vault key."
+  type        = bool
+  default     = false
+}
+
+variable "kms_key_vault_key_id" {
+  description = "Key Vault key ID used for AKS KMS secret encryption. Required when kms_enabled = true."
+  type        = string
+  default     = ""
+
+  validation {
+    condition     = var.kms_enabled == false || length(var.kms_key_vault_key_id) > 0
+    error_message = "kms_key_vault_key_id must be supplied when kms_enabled is true."
+  }
+}
+
+variable "kms_key_vault_network_access" {
+  description = "Network access mode for the KMS key vault. Must be 'Public' unless the cluster uses API Server VNet Integration, which is required for 'Private'."
+  type        = string
+  default     = "Public"
+
+  validation {
+    condition     = contains(["Public", "Private"], var.kms_key_vault_network_access)
+    error_message = "kms_key_vault_network_access must be either 'Public' or 'Private'."
+  }
+}
+
+variable "kms_identity_id" {
+  description = "Resource ID of the user-assigned managed identity used by AKS KMS. Required when kms_enabled = true, as KMS does not support the cluster's system-assigned identity."
+  type        = string
+  default     = ""
+
+  validation {
+    condition     = var.kms_enabled == false || length(var.kms_identity_id) > 0
+    error_message = "kms_identity_id must be supplied when kms_enabled is true."
+  }
+}
+
+variable "kms_identity_principal_id" {
+  description = "Principal (object) ID of the user-assigned managed identity used by AKS KMS. Required when kms_enabled = true."
+  type        = string
+  default     = ""
+
+  validation {
+    condition     = var.kms_enabled == false || length(var.kms_identity_principal_id) > 0
+    error_message = "kms_identity_principal_id must be supplied when kms_enabled is true."
+  }
+}
+
+variable "api_server_vnet_integration_enabled" {
+  description = "Enable API Server VNet Integration. Required for KMS with a private key vault."
+  type        = bool
+  default     = false
+}
+
+variable "api_server_subnet_id" {
+  description = "Resource ID of the delegated subnet for the API server. Required when api_server_vnet_integration_enabled = true."
+  type        = string
+  default     = ""
+
+  validation {
+    condition     = var.api_server_vnet_integration_enabled == false || length(var.api_server_subnet_id) > 0
+    error_message = "api_server_subnet_id must be supplied when api_server_vnet_integration_enabled is true."
+  }
 }

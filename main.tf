@@ -1,3 +1,7 @@
+locals {
+  aks_identity_principal_id = var.kms_enabled ? var.kms_identity_principal_id : azurerm_kubernetes_cluster.this.identity[0].principal_id
+}
+
 resource "azurerm_kubernetes_cluster" "this" {
   provider                            = azurerm.spoke
   name                                = var.aks_name
@@ -22,11 +26,15 @@ resource "azurerm_kubernetes_cluster" "this" {
     pod_cidr            = "192.168.0.0/16"
   }
 
+  # Included for public clusters (to set authorized_ip_ranges) or when vnet integration is enabled (to set subnet_id).
+  # Omitted only for private clusters without vnet integration, where AKS manages API server access internally.
   dynamic "api_server_access_profile" {
-    for_each = var.pe_enabled ? [] : ["apply"]
+    for_each = var.api_server_vnet_integration_enabled || !var.pe_enabled ? ["apply"] : []
 
     content {
-      authorized_ip_ranges = var.pe_enabled ? [] : var.ip_rules
+      authorized_ip_ranges                = var.pe_enabled ? [] : var.ip_rules
+      virtual_network_integration_enabled = var.api_server_vnet_integration_enabled
+      subnet_id                           = var.api_server_vnet_integration_enabled ? var.api_server_subnet_id : null
     }
   }
 
@@ -34,8 +42,8 @@ resource "azurerm_kubernetes_cluster" "this" {
     for_each = var.istio_enabled ? [1] : []
 
     content {
-      mode = "Istio"
-      revisions = var.istio_revisions
+      mode                             = "Istio"
+      revisions                        = var.istio_revisions
       internal_ingress_gateway_enabled = var.istio_internal_ingress_gateway_enabled
       external_ingress_gateway_enabled = var.istio_external_ingress_gateway_enabled
 
@@ -43,11 +51,11 @@ resource "azurerm_kubernetes_cluster" "this" {
         for_each = var.istio_certificate_authority_enabled ? [1] : []
 
         content {
-          key_vault_id                = var.istio_ca_key_vault_id
-          root_cert_object_name       = var.istio_ca_root_cert_object_name
-          cert_chain_object_name      = var.istio_ca_cert_chain_object_name
-          cert_object_name            = var.istio_ca_cert_object_name
-          key_object_name             = var.istio_ca_key_object_name
+          key_vault_id           = var.istio_ca_key_vault_id
+          root_cert_object_name  = var.istio_ca_root_cert_object_name
+          cert_chain_object_name = var.istio_ca_cert_chain_object_name
+          cert_object_name       = var.istio_ca_cert_object_name
+          key_object_name        = var.istio_ca_key_object_name
         }
       }
     }
@@ -79,7 +87,17 @@ resource "azurerm_kubernetes_cluster" "this" {
   }
 
   identity {
-    type = "SystemAssigned"
+    type         = var.kms_enabled ? "UserAssigned" : "SystemAssigned"
+    identity_ids = var.kms_enabled ? [var.kms_identity_id] : null
+  }
+
+  dynamic "key_management_service" {
+    for_each = var.kms_enabled ? [1] : []
+
+    content {
+      key_vault_key_id         = var.kms_key_vault_key_id
+      key_vault_network_access = var.kms_key_vault_network_access
+    }
   }
 
   key_vault_secrets_provider {
@@ -87,7 +105,7 @@ resource "azurerm_kubernetes_cluster" "this" {
     secret_rotation_interval = "2m"
   }
 
-  monitor_metrics { }
+  monitor_metrics {}
 
   storage_profile {
     blob_driver_enabled = true
@@ -101,20 +119,20 @@ resource "azurerm_kubernetes_cluster" "this" {
 resource "azurerm_kubernetes_cluster_node_pool" "node_pools" {
   for_each = { for i, s in var.user_node_pools : i => s }
 
-  provider              = azurerm.spoke
-  name                  = each.value.name
-  vm_size               = each.value.vm_size
-  vnet_subnet_id        = data.azurerm_subnet.aks.id
-  kubernetes_cluster_id = azurerm_kubernetes_cluster.this.id
-  os_disk_size_gb       = each.value.disk_size
-  auto_scaling_enabled  = true
-  min_count             = each.value.min_count
-  max_count             = each.value.max_count
-  node_count            = each.value.min_count
-  os_type               = each.value.os_type
-  priority              = var.aks_use_spot ? "Spot" : "Regular"
-  spot_max_price        = var.aks_use_spot ? -1 : null
-  eviction_policy       = var.aks_use_spot ? "Delete" : null
+  provider                    = azurerm.spoke
+  name                        = each.value.name
+  vm_size                     = each.value.vm_size
+  vnet_subnet_id              = data.azurerm_subnet.aks.id
+  kubernetes_cluster_id       = azurerm_kubernetes_cluster.this.id
+  os_disk_size_gb             = each.value.disk_size
+  auto_scaling_enabled        = true
+  min_count                   = each.value.min_count
+  max_count                   = each.value.max_count
+  node_count                  = each.value.min_count
+  os_type                     = each.value.os_type
+  priority                    = var.aks_use_spot ? "Spot" : "Regular"
+  spot_max_price              = var.aks_use_spot ? -1 : null
+  eviction_policy             = var.aks_use_spot ? "Delete" : null
   temporary_name_for_rotation = "tmp${substr(each.value.name, 0, 9)}"
 
   lifecycle {
@@ -129,7 +147,7 @@ resource "azurerm_role_assignment" "aks_vnet_reader" {
   scope                = data.azurerm_virtual_network.this.id
   role_definition_name = "Network Contributor"
   principal_type       = "ServicePrincipal"
-  principal_id         = azurerm_kubernetes_cluster.this.identity[0].principal_id
+  principal_id         = local.aks_identity_principal_id
 }
 
 # TODO - We need to grant permissions to the pipeline SP (not the terraform SP), so that it can do helm deploys
