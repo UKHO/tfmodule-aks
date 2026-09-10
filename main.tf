@@ -97,7 +97,6 @@ resource "azurerm_kubernetes_cluster" "this" {
     for_each = var.aad_rbac_enabled ? [1] : []
 
     content {
-      managed                = true
       azure_rbac_enabled     = false
       tenant_id              = var.tenant_id
       admin_group_object_ids = var.aad_admin_group_object_ids
