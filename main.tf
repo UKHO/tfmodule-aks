@@ -11,6 +11,7 @@ resource "azurerm_kubernetes_cluster" "this" {
   azure_policy_enabled                = true
   http_application_routing_enabled    = false
   role_based_access_control_enabled   = true
+  local_account_disabled              = var.local_account_disabled
   sku_tier                            = var.aks_sku
   workload_identity_enabled           = true
   oidc_issuer_enabled                 = true
@@ -89,6 +90,18 @@ resource "azurerm_kubernetes_cluster" "this" {
   identity {
     type         = var.kms_enabled ? "UserAssigned" : "SystemAssigned"
     identity_ids = var.kms_enabled ? [var.kms_identity_id] : null
+  }
+
+  # Managed Entra ID authentication with Kubernetes RBAC (not Azure RBAC); opt-in so existing consumers are unaffected.
+  dynamic "azure_active_directory_role_based_access_control" {
+    for_each = var.aad_rbac_enabled ? [1] : []
+
+    content {
+      managed                = true
+      azure_rbac_enabled     = false
+      tenant_id              = var.tenant_id
+      admin_group_object_ids = var.aad_admin_group_object_ids
+    }
   }
 
   dynamic "key_management_service" {
