@@ -434,3 +434,23 @@ variable "api_server_subnet_id" {
     error_message = "api_server_subnet_id must be supplied when api_server_vnet_integration_enabled is true."
   }
 }
+
+# Entra ID / RBAC
+
+variable "aad_rbac_enabled" {
+  description = "Enable managed Entra ID authentication with Kubernetes RBAC. Opt-in; existing consumers default to disabled."
+  type        = bool
+  default     = false
+}
+
+variable "aad_admin_group_object_ids" {
+  description = "Entra ID group object IDs granted cluster-admin via managed Entra authentication."
+  type        = list(string)
+  default     = []
+}
+
+variable "local_account_disabled" {
+  description = "Disable AKS local accounts (removes the clusterAdmin/clusterUser certificate bypass). Stage to true only after Entra access is verified."
+  type        = bool
+  default     = false
+}
