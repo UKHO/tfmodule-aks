@@ -159,6 +159,69 @@ variable "aks_use_spot" {
   default     = false
 }
 
+# Node OS upgrades
+
+variable "node_os_upgrade_channel" {
+  description = "Upgrade channel for the node OS image. Possible values are 'Unmanaged', 'SecurityPatch', 'NodeImage' and 'None'"
+  type        = string
+  default     = "NodeImage"
+
+  validation {
+    condition     = contains(["Unmanaged", "SecurityPatch", "NodeImage", "None"], var.node_os_upgrade_channel)
+    error_message = "The node_os_upgrade_channel variable must be one of 'Unmanaged', 'SecurityPatch', 'NodeImage' or 'None'"
+  }
+}
+
+variable "maintenance_window_node_os" {
+  description = "Window constraining when node OS image upgrades may run. When null, AKS applies node image upgrades at any time of day"
+
+  type = object({
+    frequency    = string
+    interval     = number
+    duration     = number
+    day_of_week  = optional(string)
+    day_of_month = optional(number)
+    week_index   = optional(string)
+    start_time   = optional(string)
+    utc_offset   = optional(string)
+    start_date   = optional(string)
+    not_allowed = optional(list(object({
+      start = string
+      end   = string
+    })), [])
+  })
+
+  default = null
+
+  validation {
+    condition = var.maintenance_window_node_os == null ? true : contains(
+      ["Daily", "Weekly", "AbsoluteMonthly", "RelativeMonthly"],
+      var.maintenance_window_node_os.frequency
+    )
+    error_message = "The maintenance_window_node_os frequency must be one of 'Daily', 'Weekly', 'AbsoluteMonthly' or 'RelativeMonthly'"
+  }
+
+  validation {
+    condition     = var.maintenance_window_node_os == null ? true : var.maintenance_window_node_os.interval > 0
+    error_message = "The maintenance_window_node_os interval must be greater than 0"
+  }
+
+  validation {
+    condition     = var.maintenance_window_node_os == null ? true : (var.maintenance_window_node_os.duration >= 4 && var.maintenance_window_node_os.duration <= 24)
+    error_message = "The maintenance_window_node_os duration must be between 4 and 24 hours"
+  }
+
+  validation {
+    condition     = var.maintenance_window_node_os == null ? true : (var.maintenance_window_node_os.frequency != "Weekly" || var.maintenance_window_node_os.day_of_week != null)
+    error_message = "The maintenance_window_node_os day_of_week must be supplied when frequency is 'Weekly'"
+  }
+
+  validation {
+    condition     = var.maintenance_window_node_os == null ? true : (var.maintenance_window_node_os.start_time == null || can(regex("^([01][0-9]|2[0-3]):[0-5][0-9]$", var.maintenance_window_node_os.start_time)))
+    error_message = "The maintenance_window_node_os start_time must be supplied in HH:mm format"
+  }
+}
+
 variable "vnet_name" {
   type = string
 

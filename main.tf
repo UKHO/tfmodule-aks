@@ -18,6 +18,7 @@ resource "azurerm_kubernetes_cluster" "this" {
   dns_prefix                          = var.aks_name
   private_dns_zone_id                 = var.pe_enabled ? "None" : null
   private_cluster_public_fqdn_enabled = var.pe_enabled
+  node_os_upgrade_channel             = var.node_os_upgrade_channel
 
   network_profile {
     network_plugin      = "azure"
@@ -56,6 +57,32 @@ resource "azurerm_kubernetes_cluster" "this" {
           cert_chain_object_name = var.istio_ca_cert_chain_object_name
           cert_object_name       = var.istio_ca_cert_object_name
           key_object_name        = var.istio_ca_key_object_name
+        }
+      }
+    }
+  }
+
+  # Omitted when null so that AKS keeps its default behaviour of upgrading node images at any time of day.
+  dynamic "maintenance_window_node_os" {
+    for_each = var.maintenance_window_node_os != null ? [var.maintenance_window_node_os] : []
+
+    content {
+      frequency    = maintenance_window_node_os.value.frequency
+      interval     = maintenance_window_node_os.value.interval
+      duration     = maintenance_window_node_os.value.duration
+      day_of_week  = maintenance_window_node_os.value.day_of_week
+      day_of_month = maintenance_window_node_os.value.day_of_month
+      week_index   = maintenance_window_node_os.value.week_index
+      start_time   = maintenance_window_node_os.value.start_time
+      utc_offset   = maintenance_window_node_os.value.utc_offset
+      start_date   = maintenance_window_node_os.value.start_date
+
+      dynamic "not_allowed" {
+        for_each = maintenance_window_node_os.value.not_allowed
+
+        content {
+          start = not_allowed.value.start
+          end   = not_allowed.value.end
         }
       }
     }
