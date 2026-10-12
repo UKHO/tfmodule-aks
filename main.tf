@@ -78,6 +78,16 @@ resource "azurerm_kubernetes_cluster" "this" {
     }
   }
 
+  # Only rendered when a setting is overridden so existing consumers keep the Azure defaults.
+  dynamic "auto_scaler_profile" {
+    for_each = var.auto_scaler_ignore_daemonsets_utilization || var.auto_scaler_scale_down_utilization_threshold != null ? [1] : []
+
+    content {
+      ignore_daemonsets_utilization_enabled = var.auto_scaler_ignore_daemonsets_utilization
+      scale_down_utilization_threshold      = var.auto_scaler_scale_down_utilization_threshold
+    }
+  }
+
   dynamic "web_app_routing" {
     for_each = var.web_app_routing_enabled ? [1] : []
 

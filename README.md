@@ -78,6 +78,20 @@ variable "aks_use_spot" {
   default     = false
 }
 
+# Cluster autoscaler
+
+variable "auto_scaler_ignore_daemonsets_utilization" {
+  type        = bool
+  description = "Exclude DaemonSet pod requests when the cluster autoscaler calculates node utilisation for scale-down. Defaults to the Azure behaviour (false)."
+  default     = false
+}
+
+variable "auto_scaler_scale_down_utilization_threshold" {
+  type        = string
+  description = "Node utilisation level (requested / capacity) below which a node is considered for scale-down, e.g. \"0.5\". Null leaves the Azure default."
+  default     = null
+}
+
 variable "vnet_name" {
   type = string
 }
